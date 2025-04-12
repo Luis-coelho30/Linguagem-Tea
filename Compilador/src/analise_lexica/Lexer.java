@@ -1,7 +1,19 @@
 package analise_lexica;
 
+import erro.AnaliseLexicaException;
+
 import java.util.ArrayList;
 
+/**
+ * A classe Lexer implementa o tokenizador responsavel pela saida da lista de tokens da analise lexica
+ *
+ * @author Luis Augusto Coelho de Souza
+ * @author Matheus Heimrath Barbosa
+ * @author Guilherme Schenekenberg Teixeira
+ * @author Pedro Vianna Carvalho
+ *
+ * @version 1.0
+ */
 public class Lexer {
 
     int index; //Indica a posicao do token na lista de tokens
@@ -40,6 +52,7 @@ public class Lexer {
                 case '-' : inserirToken(TokenType.SUB, "-"); break;
                 case '+' : inserirToken(TokenType.SOMA, "+"); break;
                 case '*' : inserirToken(TokenType.MUL, "*"); break;
+                case '%' : inserirToken(TokenType.MOD, "%"); break;
                 case ';' : inserirToken(TokenType.TERMINATOR, ";"); break;
                 case '[' : inserirToken(TokenType.COLCHETE_ESQ, "["); break;
                 case ']' : inserirToken(TokenType.COLCHETE_DIR, "]"); break;
@@ -47,6 +60,7 @@ public class Lexer {
                 case '\r':
                 case '\t':
                 case '_':
+                case '\0':
                     break;
                 case '\n': linha++; posToken = -1; break;
 
@@ -104,6 +118,7 @@ public class Lexer {
                         adicionarPalavraReservada(programa);
                     } else {
                         //Erro: caractere nao suportado
+                        throw new AnaliseLexicaException("Caractere '" + c + "' nao suportado!");
                     }
             }
         }
@@ -113,16 +128,34 @@ public class Lexer {
         return listaTokens;
     }
 
+    /**
+     * Retorna true se o apontador tiver completado a leitura do programa e caso contrario, false
+     *
+     * @param programa A string que contem o programa a ser analisado
+     * @return true se o apontador tiver completado a leitura do programa senao false
+     */
     public boolean fimPrograma(String programa) {
         return posAtual >= programa.length();
     }
 
+    /**
+     * Realiza a adicao de um lexema na lista de tokens
+     *
+     * @param tipo o tipo do token
+     * @param lexema o lexema do token
+     */
     private void inserirToken(TokenType tipo, String lexema) {
         int inicioToken = posToken - lexema.length() + 1;
         listaTokens.add(new Token(index, inicioToken, posToken, lexema, tipo, linha));
         index++;
     }
 
+    /**
+     * Avanca o apontador que realiza a leitura do programa
+     *
+     * @param programa a String que sera analisada
+     * @return o proximo caractere do programa
+     */
     private char avancar(String programa) {
         char proxChar;
         posAtual++; posToken++;
@@ -133,6 +166,10 @@ public class Lexer {
         return proxChar;
     }
 
+    /**
+     * Realiza o recuo dos apontadores do programa
+     *
+     */
     private void recuar() {
         posAtual = posAtual - 1;
         posToken = posToken - 1;
@@ -148,18 +185,41 @@ public class Lexer {
         return !fimPrograma(programa) && programa.charAt(posAtual) == expectedChar;
     }
 
+    /**
+     * Obtem o caractere atual
+     *
+     * @param programa a String do programa a ser analisado
+     * @return o caractere atual
+     */
     private char obterCharAtual(String programa) {
         return fimPrograma(programa) ? '\0' : programa.charAt(posAtual);
     }
 
+    /**
+     * Verificar se o caractere c eh um digito [0-9]
+     *
+     * @param c o caractere c a ser analisado
+     * @return true se c for um digito, senao false
+     */
     private boolean verificarDigito(char c) {
         return Character.toString(c).matches("\\d");
     }
 
+    /**
+     * Verificar se o caractere c eh uma letra [a-zA-Z]
+     *
+     * @param c o caractere c a ser analisado
+     * @return true se c for uma letra, senao false
+     */
     private boolean verificarLetra(char c) {
         return Character.toString(c).matches("[a-zA-Z]");
     }
 
+    /**
+     * Realiza a adicao de um literal String na lista de tokens
+     *
+     * @param programa a String do programa a ser analisado
+     */
     private void adicionarLiteralString(String programa) {
         String novoLexema = "";
         avancar(programa);
@@ -180,6 +240,11 @@ public class Lexer {
         inserirToken(TokenType.STRING, novoLexema);
     }
 
+    /**
+     * Realiza a adicao de um literal numerico na lista de tokens
+     *
+     * @param programa a String do programa a ser analisado
+     */
     private void adicionarLiteralNumerico(String programa) {
         String novoLexema = "";
 
@@ -203,6 +268,11 @@ public class Lexer {
         inserirToken(TokenType.NUMERO, novoLexema); //Absorve o token
     }
 
+    /**
+     * Realiza a adicao de um literal caractere na lista de tokens
+     *
+     * @param programa a String do programa a ser analisado
+     */
     private void adicionarLiteralCaractere(String programa) {
         char c = avancar(programa); //Consome o caractere '
         if (c=='\'') {
@@ -214,6 +284,11 @@ public class Lexer {
         inserirToken(TokenType.CARACTERE, Character.toString(c));
     }
 
+    /**
+     * Realiza a adicao de uma palavra reservada se ela existir no conjunto definido, senao adiciona um identificador
+     *
+     * @param programa a String do programa a ser analisado
+     */
     private void adicionarPalavraReservada(String programa) {
         String novoLexema = "";
         char c = obterCharAtual(programa);

@@ -1,5 +1,15 @@
 package analise_lexica;
 
+/**
+ * A classe Token implementa o tipo Token
+ *
+ * @author Luis Augusto Coelho de Souza
+ * @author Matheus Heimrath Barbosa
+ * @author Guilherme Schenekenberg Teixeira
+ * @author Pedro Vianna Carvalho
+ *
+ * @version 1.0
+ */
 public class Token {
 
     private int index;
