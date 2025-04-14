@@ -23,6 +23,7 @@ public class PalavrasReservadas {
         conjuntoPalavrasReservadas.put("char", TokenType.CHAR);
         conjuntoPalavrasReservadas.put("float", TokenType.FLOAT);
         conjuntoPalavrasReservadas.put("double", TokenType.DOUBLE);
+        conjuntoPalavrasReservadas.put("string", TokenType.STRING);
         conjuntoPalavrasReservadas.put("inc", TokenType.INC);
         conjuntoPalavrasReservadas.put("dec", TokenType.DEC);
         conjuntoPalavrasReservadas.put("else", TokenType.ELSE);

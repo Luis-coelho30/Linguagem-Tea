@@ -223,7 +223,8 @@ public class Lexer {
     private void adicionarLiteralString(String programa) {
         String novoLexema = "";
         avancar(programa);
-        while(!verificarCharAtual(programa, '\"')) {
+        //Verificar fim da string
+        while(!verificarCharAtual(programa, '\"') && !fimPrograma(programa)) {
             if(verificarCharAtual(programa, '\n')) {
                 linha++; posToken = -1;
             }
@@ -232,6 +233,7 @@ public class Lexer {
         }
         if(fimPrograma(programa)) {
             //Erro: String nao terminada
+            throw new AnaliseLexicaException("Literal String nao terminada.");
         }
         else {
             avancar(programa); //Consome o terminador do literal string
@@ -262,6 +264,7 @@ public class Lexer {
             }
             else {
                 //Erro: literal numerico nao terminado
+                throw new AnaliseLexicaException("Literal numerico nao terminado.");
             }
         }
         recuar();
@@ -277,8 +280,10 @@ public class Lexer {
         char c = avancar(programa); //Consome o caractere '
         if (c=='\'') {
             //TO-DO erro: Literal vazio
+            throw new AnaliseLexicaException("Literal caractere vazio.");
         } else if(avancar(programa)!='\'') {
             //TO-DO erro: Literal invalida, uma literal caractere so comporta um unico caractere
+            throw new AnaliseLexicaException("Literal caractere invalida: o literal caractere deve possuir apenas um caractere.");
         }
 
         inserirToken(TokenType.CARACTERE, Character.toString(c));
