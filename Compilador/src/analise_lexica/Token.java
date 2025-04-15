@@ -15,10 +15,10 @@ public class Token {
     private int index;
     private int posInicial, posFinal;
     private String lexema;
-    private TokenType tipo;
+    private TeaToken tipo;
     private int linha;
 
-    public Token(int index, int posInicial, int posFinal, String lexema, TokenType tipo, int linha) {
+    public Token(int index, int posInicial, int posFinal, String lexema, TeaToken tipo, int linha) {
         this.index = index;
         this.posInicial = posInicial;
         this.posFinal = posFinal;
@@ -59,11 +59,11 @@ public class Token {
         this.lexema = lexema;
     }
 
-    public TokenType getTipo() {
+    public TeaToken getTipo() {
         return tipo;
     }
 
-    public void setTipo(TokenType tipo) {
+    public void setTipo(TeaToken tipo) {
         this.tipo = tipo;
     }
 

@@ -1,4 +1,4 @@
-package erro;
+package exception;
 
 public class CompileTimeException extends RuntimeException {
     public CompileTimeException(String message) {

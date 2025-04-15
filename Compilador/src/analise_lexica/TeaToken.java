@@ -10,11 +10,11 @@ package analise_lexica;
  *
  * @version 1.0
  */
-public enum TokenType {
+public enum TeaToken {
 
     //Tokens com um caractere
     PAREN_ESQ, PAREN_DIR, CHAVE_ESQ, CHAVE_DIR,
-    VIRGULA, PONTO, SUB, SOMA, MUL, DIV, TERMINATOR,
+    VIRGULA, PONTO, DOIS_PONTOS, SUB, SOMA, MUL, DIV, TERMINAL,
     COLCHETE_ESQ, COLCHETE_DIR,
     ATRIBUICAO, NOT, MOD,
 
@@ -24,9 +24,9 @@ public enum TokenType {
     MENOR_QUE, MENOR_IGUAL,
 
     //Tipos literais
-    IDENTIFICADOR, STRING, NUMERO, CARACTERE,
+    IDENTIFICADOR, STRING, NUMERO, PONTO_FLUTUANTE,CARACTERE,
 
     // Palavras reservadas
-    AND, OR, INT, FLOAT, DOUBLE, BOOL, CHAR, FALSE, TRUE, INC, DEC,
-    ELSE, IF, FOR, WHILE, DO, SWITCH, CASE, STRUCT, PRINT, RETURN, EOF
+    AND, OR, INT, FLOAT, DOUBLE, BOOL, CHAR, INC, DEC,
+    ELSE, IF, FOR, WHILE, DO, SWITCH, CASE, DEFAULT, STRUCT, PRINT, RETURN, EOF
 }

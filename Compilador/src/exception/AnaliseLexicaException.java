@@ -1,4 +1,4 @@
-package erro;
+package exception;
 
 public class AnaliseLexicaException extends CompileTimeException {
 

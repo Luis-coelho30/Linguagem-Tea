@@ -1,6 +1,6 @@
 package analise_lexica;
 
-import erro.AnaliseLexicaException;
+import exception.AnaliseLexicaException;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class Lexer {
     int posToken; //Indica a posicao final de cada token de acordo com a linha em que ele esta presente
     int linha; //A linha do token
     //Inicia a classe que armazena as palavras reservadas da linguagem
-    private PalavrasReservadas palavrasReservadas = new PalavrasReservadas();
+    private final DicionarioPalavrasReservadas dicionarioPalavrasReservadas = new DicionarioPalavrasReservadas();
     //Inicia a lista de tokens do Lexer
     private ArrayList<Token> listaTokens = new ArrayList<>();
 
@@ -43,19 +43,20 @@ public class Lexer {
 
             //Buscando tokens com um unico caractere
             switch (c) {
-                case '(' : inserirToken(TokenType.PAREN_ESQ, "("); break;
-                case ')' : inserirToken(TokenType.PAREN_DIR, ")"); break;
-                case '{' : inserirToken(TokenType.CHAVE_ESQ, "{"); break;
-                case '}' : inserirToken(TokenType.CHAVE_DIR, "}"); break;
-                case ',' : inserirToken(TokenType.VIRGULA, ","); break;
-                case '.' : inserirToken(TokenType.PONTO, "."); break;
-                case '-' : inserirToken(TokenType.SUB, "-"); break;
-                case '+' : inserirToken(TokenType.SOMA, "+"); break;
-                case '*' : inserirToken(TokenType.MUL, "*"); break;
-                case '%' : inserirToken(TokenType.MOD, "%"); break;
-                case ';' : inserirToken(TokenType.TERMINATOR, ";"); break;
-                case '[' : inserirToken(TokenType.COLCHETE_ESQ, "["); break;
-                case ']' : inserirToken(TokenType.COLCHETE_DIR, "]"); break;
+                case '(' : inserirToken(TeaToken.PAREN_ESQ, "("); break;
+                case ')' : inserirToken(TeaToken.PAREN_DIR, ")"); break;
+                case '{' : inserirToken(TeaToken.CHAVE_ESQ, "{"); break;
+                case '}' : inserirToken(TeaToken.CHAVE_DIR, "}"); break;
+                case ',' : inserirToken(TeaToken.VIRGULA, ","); break;
+                case '.' : inserirToken(TeaToken.PONTO, "."); break;
+                case '-' : inserirToken(TeaToken.SUB, "-"); break;
+                case '+' : inserirToken(TeaToken.SOMA, "+"); break;
+                case '*' : inserirToken(TeaToken.MUL, "*"); break;
+                case '%' : inserirToken(TeaToken.MOD, "%"); break;
+                case ';' : inserirToken(TeaToken.TERMINAL, ";"); break;
+                case '[' : inserirToken(TeaToken.COLCHETE_ESQ, "["); break;
+                case ']' : inserirToken(TeaToken.COLCHETE_DIR, "]"); break;
+                case ':' : inserirToken(TeaToken.DOIS_PONTOS, ":"); break;
                 case ' ':
                 case '\r':
                 case '\t':
@@ -66,34 +67,34 @@ public class Lexer {
 
                 //Buscando tokens com um ou dois caracteres
                 case '=' :
-                    if(avancar(programa)=='=') inserirToken(TokenType.IGUAL, "==");
+                    if(avancar(programa)=='=') inserirToken(TeaToken.IGUAL, "==");
                     else {
                         recuar();
-                        inserirToken(TokenType.ATRIBUICAO, "=");
+                        inserirToken(TeaToken.ATRIBUICAO, "=");
                     }
                     break;
 
                 case '<' :
-                    if(avancar(programa)=='=') inserirToken(TokenType.MENOR_IGUAL, "<=");
+                    if(avancar(programa)=='=') inserirToken(TeaToken.MENOR_IGUAL, "<=");
                     else {
                         recuar();
-                        inserirToken(TokenType.MENOR_QUE, "<");
+                        inserirToken(TeaToken.MENOR_QUE, "<");
                     }
                     break;
 
                 case '>' :
-                    if(avancar(programa)=='=') inserirToken(TokenType.MAIOR_IGUAL, ">=");
+                    if(avancar(programa)=='=') inserirToken(TeaToken.MAIOR_IGUAL, ">=");
                     else {
                         recuar();
-                        inserirToken(TokenType.MAIOR_QUE, ">");
+                        inserirToken(TeaToken.MAIOR_QUE, ">");
                     }
                     break;
 
                 case '!' :
-                    if(avancar(programa)=='=') inserirToken(TokenType.DIFERENTE, "!=");
+                    if(avancar(programa)=='=') inserirToken(TeaToken.DIFERENTE, "!=");
                     else {
                         recuar();
-                        inserirToken(TokenType.NOT, "!");
+                        inserirToken(TeaToken.NOT, "!");
                     }
                     break;
 
@@ -101,7 +102,7 @@ public class Lexer {
                     if(verificarCharAtual(programa,'/')) {
                         while (!verificarCharAtual(programa, '\n')) avancar(programa);
                     }
-                    else inserirToken(TokenType.DIV, "/");
+                    else inserirToken(TeaToken.DIV, "/");
                     break;
 
                 case '\'': adicionarLiteralCaractere(programa); break;
@@ -123,7 +124,7 @@ public class Lexer {
             }
         }
 
-        listaTokens.add(new Token(index, posToken, posToken, "EOF", TokenType.EOF, linha));
+        listaTokens.add(new Token(index, posToken, posToken, "EOF", TeaToken.EOF, linha));
 
         return listaTokens;
     }
@@ -144,7 +145,7 @@ public class Lexer {
      * @param tipo o tipo do token
      * @param lexema o lexema do token
      */
-    private void inserirToken(TokenType tipo, String lexema) {
+    private void inserirToken(TeaToken tipo, String lexema) {
         int inicioToken = posToken - lexema.length() + 1;
         listaTokens.add(new Token(index, inicioToken, posToken, lexema, tipo, linha));
         index++;
@@ -239,7 +240,7 @@ public class Lexer {
             avancar(programa); //Consome o terminador do literal string
         }
 
-        inserirToken(TokenType.STRING, novoLexema);
+        inserirToken(TeaToken.STRING, novoLexema);
     }
 
     /**
@@ -257,18 +258,22 @@ public class Lexer {
         if(!fimPrograma(programa) && programa.charAt(posAtual) == '.') {
             novoLexema = novoLexema.concat(Character.toString(programa.charAt(posAtual)));
             avancar(programa); //Consome o '.'
-            if(verificarDigito(programa.charAt(posAtual))) {
+            if(!fimPrograma(programa) && verificarDigito(programa.charAt(posAtual))) {
                 do {
                     novoLexema = novoLexema.concat(Character.toString(programa.charAt(posAtual)));
                 } while (verificarDigito(avancar(programa)));
+                recuar();
+                inserirToken(TeaToken.PONTO_FLUTUANTE, novoLexema);
             }
             else {
                 //Erro: literal numerico nao terminado
                 throw new AnaliseLexicaException("Literal numerico nao terminado.");
             }
         }
-        recuar();
-        inserirToken(TokenType.NUMERO, novoLexema); //Absorve o token
+        else {
+            recuar();
+            inserirToken(TeaToken.NUMERO, novoLexema); //Absorve o token
+        }
     }
 
     /**
@@ -279,14 +284,14 @@ public class Lexer {
     private void adicionarLiteralCaractere(String programa) {
         char c = avancar(programa); //Consome o caractere '
         if (c=='\'') {
-            //TO-DO erro: Literal vazio
+            //erro: Literal vazio
             throw new AnaliseLexicaException("Literal caractere vazio.");
         } else if(avancar(programa)!='\'') {
-            //TO-DO erro: Literal invalida, uma literal caractere so comporta um unico caractere
+            //erro: Literal invalida, uma literal caractere so comporta um unico caractere
             throw new AnaliseLexicaException("Literal caractere invalida: o literal caractere deve possuir apenas um caractere.");
         }
 
-        inserirToken(TokenType.CARACTERE, Character.toString(c));
+        inserirToken(TeaToken.CARACTERE, Character.toString(c));
     }
 
     /**
@@ -302,7 +307,7 @@ public class Lexer {
             c = avancar(programa);
         } while (verificarLetra(c) || verificarDigito(c));
 
-        TokenType tipo = palavrasReservadas.obterTipoToken(novoLexema);
+        TeaToken tipo = dicionarioPalavrasReservadas.obterTipoToken(novoLexema);
         recuar();
         inserirToken(tipo, novoLexema);
     }
