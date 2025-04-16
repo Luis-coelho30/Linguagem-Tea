@@ -136,7 +136,7 @@ public class Lexer {
      * @return true se o apontador tiver completado a leitura do programa senao false
      */
     public boolean fimPrograma(String programa) {
-        return posAtual >= programa.length();
+        return posAtual == programa.length();
     }
 
     /**
@@ -187,16 +187,6 @@ public class Lexer {
     }
 
     /**
-     * Obtem o caractere atual
-     *
-     * @param programa a String do programa a ser analisado
-     * @return o caractere atual
-     */
-    private char obterCharAtual(String programa) {
-        return fimPrograma(programa) ? '\0' : programa.charAt(posAtual);
-    }
-
-    /**
      * Verificar se o caractere c eh um digito [0-9]
      *
      * @param c o caractere c a ser analisado
@@ -223,21 +213,20 @@ public class Lexer {
      */
     private void adicionarLiteralString(String programa) {
         String novoLexema = "";
-        avancar(programa);
-        //Verificar fim da string
-        while(!verificarCharAtual(programa, '\"') && !fimPrograma(programa)) {
+        char c = avancar(programa);
+        //Buscar fim da string (\")
+        while(c != '\0' && c != '\"') {
             if(verificarCharAtual(programa, '\n')) {
-                linha++; posToken = -1;
+                novoLexema = novoLexema.concat("\\n");
             }
-            novoLexema = novoLexema.concat(Character.toString(programa.charAt(posAtual)));
-            avancar(programa);
+            else {
+                novoLexema = novoLexema.concat(Character.toString(c));
+            }
+            c = avancar(programa);
         }
-        if(fimPrograma(programa)) {
+        if(c == '\0') {
             //Erro: String nao terminada
             throw new AnaliseLexicaException("Literal String nao terminada.");
-        }
-        else {
-            avancar(programa); //Consome o terminador do literal string
         }
 
         inserirToken(TeaToken.STRING, novoLexema);
@@ -250,18 +239,21 @@ public class Lexer {
      */
     private void adicionarLiteralNumerico(String programa) {
         String novoLexema = "";
+        char c = programa.charAt(posAtual);
 
         do {
-            novoLexema = novoLexema.concat(Character.toString(programa.charAt(posAtual)));
-        } while (verificarDigito(avancar(programa)));
+            novoLexema = novoLexema.concat(Character.toString(c));
+            c = avancar(programa);
+        } while (verificarDigito(c));
 
-        if(!fimPrograma(programa) && programa.charAt(posAtual) == '.') {
-            novoLexema = novoLexema.concat(Character.toString(programa.charAt(posAtual)));
-            avancar(programa); //Consome o '.'
-            if(!fimPrograma(programa) && verificarDigito(programa.charAt(posAtual))) {
+        if(c == '.') {
+            novoLexema = novoLexema.concat(Character.toString(c));
+            c = avancar(programa); //Consome o '.'
+            if(verificarDigito(c)) {
                 do {
-                    novoLexema = novoLexema.concat(Character.toString(programa.charAt(posAtual)));
-                } while (verificarDigito(avancar(programa)));
+                    novoLexema = novoLexema.concat(Character.toString(c));
+                    c = avancar(programa);
+                } while (verificarDigito(c));
                 recuar();
                 inserirToken(TeaToken.PONTO_FLUTUANTE, novoLexema);
             }
@@ -301,7 +293,7 @@ public class Lexer {
      */
     private void adicionarPalavraReservada(String programa) {
         String novoLexema = "";
-        char c = obterCharAtual(programa);
+        char c = programa.charAt(posAtual);
         do {
             novoLexema = novoLexema.concat(Character.toString(c));
             c = avancar(programa);
