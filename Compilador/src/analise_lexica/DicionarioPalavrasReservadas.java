@@ -3,7 +3,7 @@ package analise_lexica;
 import java.util.HashMap;
 
 /**
- * A classe PalavrasReservadas implementa um hashmap que simboliza o dicionario de palavras presentes na linguagem Tea
+ * A classe DicionarioPalavrasReservadas implementa um hashmap que simboliza o dicionario de palavras presentes na linguagem Tea
  *
  * @author Luis Augusto Coelho de Souza
  * @author Matheus Heimrath Barbosa
@@ -37,6 +37,8 @@ public class DicionarioPalavrasReservadas {
         palavrasReservadasDic.put("struct", TeaToken.STRUCT);
         palavrasReservadasDic.put("print", TeaToken.PRINT);
         palavrasReservadasDic.put("return", TeaToken.RETURN);
+        palavrasReservadasDic.put("main", TeaToken.MAIN);
+        palavrasReservadasDic.put("void", TeaToken.VOID);
     }
 
     public TeaToken obterTipoToken(String lexema) {

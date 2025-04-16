@@ -1,7 +1,7 @@
 package analise_lexica;
 
 /**
- * O enum TokenType define os tipos de tokens existentes na linguagem Tea
+ * O enum TeaToken define os tipos de tokens existentes na linguagem Tea
  *
  * @author Luis Augusto Coelho de Souza
  * @author Matheus Heimrath Barbosa
@@ -24,9 +24,11 @@ public enum TeaToken {
     MENOR_QUE, MENOR_IGUAL,
 
     //Tipos literais
-    IDENTIFICADOR, STRING, NUMERO, PONTO_FLUTUANTE,CARACTERE,
+    IDENTIFICADOR, STRING, NUMERO, PONTO_FLUTUANTE, CARACTERE,
 
     // Palavras reservadas
-    AND, OR, INT, FLOAT, DOUBLE, BOOL, CHAR, INC, DEC,
-    ELSE, IF, FOR, WHILE, DO, SWITCH, CASE, DEFAULT, STRUCT, PRINT, RETURN, EOF
+    AND, OR, INT, FLOAT, DOUBLE, BOOL, CHAR, INC, DEC, MAIN, VOID,
+    ELSE, IF, FOR, WHILE, DO, SWITCH, CASE, DEFAULT, STRUCT, PRINT, RETURN,
+
+    EOF
 }
