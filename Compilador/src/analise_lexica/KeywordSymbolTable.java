@@ -3,7 +3,7 @@ package analise_lexica;
 import java.util.HashMap;
 
 /**
- * A classe DicionarioPalavrasReservadas implementa um hashmap que simboliza o dicionario de palavras presentes na linguagem Tea
+ * A classe KeywordSymbolTable implementa um hashmap que simboliza o dicionario de palavras presentes na linguagem Tea
  *
  * @author Luis Augusto Coelho de Souza
  * @author Matheus Heimrath Barbosa
@@ -12,10 +12,10 @@ import java.util.HashMap;
  *
  * @version 1.0
  */
-public class DicionarioPalavrasReservadas {
+public class KeywordSymbolTable {
     HashMap<String, TeaToken> palavrasReservadasDic = new HashMap<>();
 
-    public DicionarioPalavrasReservadas() {
+    public KeywordSymbolTable() {
         palavrasReservadasDic.put("AND", TeaToken.AND);
         palavrasReservadasDic.put("OR", TeaToken.OR);
         palavrasReservadasDic.put("int", TeaToken.INT);
@@ -42,10 +42,9 @@ public class DicionarioPalavrasReservadas {
     }
 
     public TeaToken obterTipoToken(String lexema) {
-        TeaToken teaToken;
-        teaToken = palavrasReservadasDic.get(lexema);
-        if(teaToken == null) {
-            teaToken = TeaToken.IDENTIFICADOR;
+        TeaToken teaToken = TeaToken.IDENTIFICADOR;
+        if(palavrasReservadasDic.containsKey(lexema)) {
+            teaToken = palavrasReservadasDic.get(lexema);
         }
 
         return teaToken;

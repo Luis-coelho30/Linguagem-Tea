@@ -21,7 +21,7 @@ public class Lexer {
     int posToken; //Indica a posicao final de cada token de acordo com a linha em que ele esta presente
     int linha; //A linha do token
     //Inicia a classe que armazena as palavras reservadas da linguagem
-    private final DicionarioPalavrasReservadas dicionarioPalavrasReservadas = new DicionarioPalavrasReservadas();
+    private final KeywordSymbolTable keywordSymbolTable = new KeywordSymbolTable();
     //Inicia a lista de tokens do Lexer
     private ArrayList<Token> listaTokens = new ArrayList<>();
 
@@ -159,7 +159,8 @@ public class Lexer {
      */
     private char avancar(String programa) {
         char proxChar;
-        posAtual++; posToken++;
+        posAtual++;
+        posToken++;
 
         if(fimPrograma(programa)) { proxChar = '\0'; }
         else proxChar = programa.charAt(posAtual);
@@ -299,7 +300,7 @@ public class Lexer {
             c = avancar(programa);
         } while (verificarLetra(c) || verificarDigito(c));
 
-        TeaToken tipo = dicionarioPalavrasReservadas.obterTipoToken(novoLexema);
+        TeaToken tipo = keywordSymbolTable.obterTipoToken(novoLexema);
         recuar();
         inserirToken(tipo, novoLexema);
     }
