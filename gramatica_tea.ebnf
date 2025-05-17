@@ -1,0 +1,76 @@
+programa ::= unidadesPreMain funcMain unidadesPosMain
+
+unidadesPreMain ::= unidade unidadesPreMain | ε
+
+funcMain ::= "main" blocoStmt
+
+unidadesPosMain ::= unidade unidadesPosMain | ε
+
+unidade ::= declGlobal | funcDecl
+
+declGlobal ::= type "id" declGlobalTail
+declGlobalTail ::= "=" expr ";" | ";"
+
+funcDecl ::= type "id" "(" paramList ")" blocoStmt
+paramList ::= param paramListTail | ε
+paramListTail ::= "," param paramListTail | ε
+param ::= type "id"
+ 
+stmt ::= declStmt | atribuicaoStmt | ifStmt | whileStmt | forStmt | doStmt | switchStmt | exprStmt | returnStmt | blocoStmt | breakStmt | emptyStmt
+stmtList ::= stmt stmtList | ε
+
+atribuicaoStmt ::= "id" "=" expr ";"
+
+declStmt ::= type "id" declStmt1
+declStmt1 ::= "=" expr ";" | ";"
+type ::= "int" | "float" | "double" | "char" | "boolean" 
+
+ifStmt ::= "if" "(" expr ")" stmt elifList elsePart
+elifList ::= elif elifList | ε 
+elif ::= "elif" "(" expr ")" stmt
+elsePart ::= "else" stmt | ε
+
+whileStmt ::= "while" "(" expr ")" stmt
+
+forStmt ::= "for" "(" forInit forCond ";" forUpdate ")" stmt
+forInit ::= atribuicaoStmt | declStmt | ";"
+forCond ::= expr | ε
+forUpdate ::= "id" "=" exprArit | ε
+
+doStmt ::= "do" stmt "while" "(" expr ")" ";"
+
+switchStmt ::= "switch" "(" exprArit ")" "{" caseList defaultPart "}"
+caseList ::= caseClause caseList | ε
+caseClause ::= "case" exprArit ":" stmtList breakStmt
+breakStmt ::= "break" ";" 
+defaultPart ::= "default" ":" stmtList | ε
+
+exprStmt ::= expr ";"
+
+returnStmt ::= "return" returnExpr ";"
+returnExpr ::= expr | ε 
+
+blocoStmt ::= "{" stmtList "}"
+
+emptyStmt ::= ";"
+
+expr ::= exprLog
+
+exprLog ::= exprRel exprLog1
+exprLog1 ::= "AND" exprRel exprLog1 | "OR" exprRel exprLog1 | ε
+
+exprRel ::= exprComp exprRel1
+exprRel1 ::= "==" exprComp exprRel1 | "!=" exprComp exprRel1 | ε
+
+exprComp ::= exprNot exprComp1
+exprComp1 ::= "<" exprArit | "<=" exprArit | ">" exprArit | ">=" exprArit | ε
+
+exprNot ::= "!" exprNot | exprArit
+
+exprArit ::= termo exprArit1
+exprArit1 ::= "+" termo exprArit1 | "-" termo exprArit1 | ε
+termo ::= fator termo1
+termo1 ::= "*" fator termo1 | "/" fator termo1 | ε
+fator ::= "(" expr ")" | num | "id" | "true" | "false"
+
+num ::= "in" | "pf"
