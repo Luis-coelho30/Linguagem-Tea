@@ -1,12 +1,10 @@
 programa ::= unidadesPreMain funcMain unidadesPosMain
 
-unidadesPreMain ::= unidade unidadesPreMain | ε
+unidadesPreMain ::= declGlobal unidadesPreMain | ε
 
 funcMain ::= "main" "(" ")" blocoStmt
 
-unidadesPosMain ::= unidade unidadesPosMain | ε
-
-unidade ::= declGlobal | funcDecl
+unidadesPosMain ::= funcDecl unidadesPosMain | ε
 
 declGlobal ::= type "id" declStmtSufixo
 
@@ -16,7 +14,7 @@ paramListTail ::= "," param paramListTail | ε
 param ::= type paramSufixo
 paramSufixo ::= "id" | "id" "[" "]"
  
-stmt ::= declStmt | ifStmt | whileStmt | forStmt | doStmt | switchStmt | exprStmt | returnStmt | blocoStmt | breakStmt | emptyStmt
+stmt ::= declStmt | ifStmt | whileStmt | forStmt | doStmt | switchStmt | assignStmt | funcCallStmt | returnStmt | blocoStmt | breakStmt | emptyStmt
 stmtList ::= stmt stmtList | ε
 
 declStmt ::= type "id" declStmtSufixo
@@ -48,7 +46,9 @@ caseClause ::= "case" exprArit ":" stmtList breakStmt
 breakStmt ::= "break" ";" 
 defaultPart ::= "default" ":" stmtList | ε
 
-exprStmt ::= expr ";"
+assignStmt ::= "id" "=" assignExpr ";"
+
+funcCallStmt ::= "id" "(" argList ")" ";"
 
 returnStmt ::= "return" returnExpr ";"
 returnExpr ::= expr | ε 
