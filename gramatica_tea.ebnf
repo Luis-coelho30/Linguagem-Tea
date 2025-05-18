@@ -2,24 +2,21 @@ programa ::= unidadesPreMain funcMain unidadesPosMain
 
 unidadesPreMain ::= unidade unidadesPreMain | ε
 
-funcMain ::= "main" blocoStmt
+funcMain ::= "main" "(" ")" blocoStmt
 
 unidadesPosMain ::= unidade unidadesPosMain | ε
 
 unidade ::= declGlobal | funcDecl
 
-declGlobal ::= type "id" declGlobalTail
-declGlobalTail ::= "=" expr ";" | ";"
+declGlobal ::= type "id" declStmt1
 
 funcDecl ::= type "id" "(" paramList ")" blocoStmt
 paramList ::= param paramListTail | ε
 paramListTail ::= "," param paramListTail | ε
 param ::= type "id"
  
-stmt ::= declStmt | atribuicaoStmt | ifStmt | whileStmt | forStmt | doStmt | switchStmt | exprStmt | returnStmt | blocoStmt | breakStmt | emptyStmt
+stmt ::= declStmt | ifStmt | whileStmt | forStmt | doStmt | switchStmt | exprStmt | returnStmt | blocoStmt | breakStmt | emptyStmt
 stmtList ::= stmt stmtList | ε
-
-atribuicaoStmt ::= "id" "=" expr ";"
 
 declStmt ::= type "id" declStmt1
 declStmt1 ::= "=" expr ";" | ";"
@@ -33,7 +30,8 @@ elsePart ::= "else" stmt | ε
 whileStmt ::= "while" "(" expr ")" stmt
 
 forStmt ::= "for" "(" forInit forCond ";" forUpdate ")" stmt
-forInit ::= atribuicaoStmt | declStmt | ";"
+forInit ::= forAssign | declStmt | ";"
+forAssign ::= "id" "=" expr ";"
 forCond ::= expr | ε
 forUpdate ::= "id" "=" exprArit | ε
 
@@ -54,7 +52,9 @@ blocoStmt ::= "{" stmtList "}"
 
 emptyStmt ::= ";"
 
-expr ::= exprLog
+expr ::= assignExpr
+
+assignExpr ::= "id" "=" assignExpr | exprLog
 
 exprLog ::= exprRel exprLog1
 exprLog1 ::= "AND" exprRel exprLog1 | "OR" exprRel exprLog1 | ε
@@ -71,6 +71,8 @@ exprArit ::= termo exprArit1
 exprArit1 ::= "+" termo exprArit1 | "-" termo exprArit1 | ε
 termo ::= fator termo1
 termo1 ::= "*" fator termo1 | "/" fator termo1 | ε
-fator ::= "(" expr ")" | num | "id" | "true" | "false"
+fator ::= "(" expr ")" | num | "id" | "true" | "false" | "id" "(" argList ")"
+argList ::= expr argListTail | ε
+argListTail ::= "," expr argListTail | ε
 
 num ::= "in" | "pf"
