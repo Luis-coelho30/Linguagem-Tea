@@ -15,13 +15,14 @@ public class Gramatica {
         regras.add(regraProd);
 
         NaoTerminal naoTerminal = regraProd.getLadoEsq();
-        List<RegraProd> lista = regrasLadoEsq.get(naoTerminal);
+        List<RegraProd> lista;
 
         if(!regrasLadoEsq.containsKey(naoTerminal)) {
             lista = new ArrayList<RegraProd>();
             regrasLadoEsq.put(naoTerminal, lista);
         }
 
+        lista = regrasLadoEsq.get(naoTerminal);
         lista.add(regraProd);
     }
 
