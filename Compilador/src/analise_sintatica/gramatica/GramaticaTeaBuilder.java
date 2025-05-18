@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class GramaticaTeaBuilder {
 
-    public static Gramatica construirGramaticaTea() {
+    public Gramatica construirGramaticaTea() {
         Gramatica gramatica = new Gramatica(new NaoTerminal("programa"));
 
         // Não-terminais

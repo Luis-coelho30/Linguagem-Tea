@@ -15,19 +15,8 @@ public class GramaticaTea {
     }
 
     private void construirGramatica() {
-
-        NaoTerminal programa = new NaoTerminal("programa");
-        NaoTerminal unidPreMain = new NaoTerminal("unidPreMain");
-
-
-
-
-
-
-
-
-        gramatica = new Gramatica(programa);
-
+        GramaticaTeaBuilder builder = new GramaticaTeaBuilder();
+        gramatica = builder.construirGramaticaTea();
     }
 
     private void calcularFirst() {
