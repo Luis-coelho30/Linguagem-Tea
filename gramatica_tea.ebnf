@@ -8,18 +8,23 @@ unidadesPosMain ::= unidade unidadesPosMain | ε
 
 unidade ::= declGlobal | funcDecl
 
-declGlobal ::= type "id" declStmt1
+declGlobal ::= type "id" declStmtSufixo
 
-funcDecl ::= type "id" "(" paramList ")" blocoStmt
+funcDecl ::= typeORtypeArray "id" "(" paramList ")" blocoStmt
 paramList ::= param paramListTail | ε
 paramListTail ::= "," param paramListTail | ε
-param ::= type "id"
+param ::= type paramSufixo
+paramSufixo ::= "id" | "id" "[" "]"
  
 stmt ::= declStmt | ifStmt | whileStmt | forStmt | doStmt | switchStmt | exprStmt | returnStmt | blocoStmt | breakStmt | emptyStmt
 stmtList ::= stmt stmtList | ε
 
-declStmt ::= type "id" declStmt1
+declStmt ::= type "id" declStmtSufixo
+declStmtSufixo ::= "[" "in" "]" ";" | declStmt1
 declStmt1 ::= "=" expr ";" | ";"
+
+typeORtypeArray ::= type | typeArray
+typeArray ::= type "[" "]"
 type ::= "int" | "float" | "double" | "char" | "boolean" 
 
 ifStmt ::= "if" "(" expr ")" stmt elifList elsePart
@@ -71,7 +76,8 @@ exprArit ::= termo exprArit1
 exprArit1 ::= "+" termo exprArit1 | "-" termo exprArit1 | ε
 termo ::= fator termo1
 termo1 ::= "*" fator termo1 | "/" fator termo1 | ε
-fator ::= "(" expr ")" | num | "id" | "true" | "false" | "id" "(" argList ")"
+fator ::= "(" expr ")" | num | "id" fatorSufixo | "true" | "false" 
+fatorSufixo ::= "(" argList ")" | "[" "in" "]" | ε
 argList ::= expr argListTail | ε
 argListTail ::= "," expr argListTail | ε
 
