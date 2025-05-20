@@ -1,5 +1,9 @@
 package analise_sintatica.gramatica;
 
+import analise_sintatica.gramatica.simbolo.NaoTerminal;
+import analise_sintatica.gramatica.simbolo.Simbolos;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class RegraProd {
@@ -18,4 +22,13 @@ public class RegraProd {
     public List<Simbolos> getLadoDir() {
         return ladoDir;
     }
+
+    public List<Boolean> listarTerminaisDerivados() {
+        List<Boolean> resultado = new ArrayList<>();
+        for (Simbolos simbolo : ladoDir) {
+            resultado.add(simbolo.ehTerminal());
+        }
+        return resultado;
+    }
+
 }
