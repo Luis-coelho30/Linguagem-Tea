@@ -19,7 +19,7 @@ public class KeywordSymbolTable {
         palavrasReservadasDic.put("AND", TeaToken.AND);
         palavrasReservadasDic.put("OR", TeaToken.OR);
         palavrasReservadasDic.put("int", TeaToken.INT);
-        palavrasReservadasDic.put("boolean", TeaToken.BOOL);
+        palavrasReservadasDic.put("boolean", TeaToken.BOOLEAN);
         palavrasReservadasDic.put("char", TeaToken.CHAR);
         palavrasReservadasDic.put("float", TeaToken.FLOAT);
         palavrasReservadasDic.put("double", TeaToken.DOUBLE);

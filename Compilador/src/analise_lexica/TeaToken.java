@@ -27,8 +27,10 @@ public enum TeaToken {
     IDENTIFICADOR, STRING, NUMERO, PONTO_FLUTUANTE, CARACTERE,
 
     // Palavras reservadas
-    AND, OR, INT, FLOAT, DOUBLE, BOOL, CHAR, INC, DEC, MAIN, VOID,
+    AND, OR, INT, FLOAT, DOUBLE, BOOLEAN, CHAR, INC, DEC, MAIN, VOID, //BOOLEAN: anteriormente BOOL
     ELSE, IF, ELIF, FOR, WHILE, DO, SWITCH, CASE, BREAK, DEFAULT, STRUCT, PRINT, RETURN,
+
+    EPS, //novo; por enquanto eh necessario para first
 
     EOF
 }
