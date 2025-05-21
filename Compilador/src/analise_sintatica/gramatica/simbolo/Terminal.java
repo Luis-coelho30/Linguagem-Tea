@@ -8,6 +8,7 @@ public class Terminal implements Simbolos {
     public Terminal(String tipoToken) {
         this.tipoToken = TeaToken.valueOf(tipoToken);
     }
+    //agora representa terminais usando valueof, nao tipo de TeaToken
 
     @Override
     public boolean ehTerminal() {
