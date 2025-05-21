@@ -141,7 +141,7 @@ public class GramaticaTea {
                 for(int i = 0; i < direita.size(); i++) { //para cada simbolo na direita
                     Simbolos atual = direita.get(i);
 
-                    if (!atual.ehTerminal()){
+                    if (!atual.ehTerminal()){ //somente nao terminais tem conjunto follow
                         String B = direita.get(i).getNome();
                         Set<String> followB = follow.computeIfAbsent(B, k -> new HashSet<>());
                         int tamanhoOriginal = followB.size();
@@ -156,11 +156,6 @@ public class GramaticaTea {
                                 contemEps = true;
                             }
                             followB.addAll(firstC);
-                            /*
-                            nota: TERMINAIS NAO POSSUEM CONJUNTO FOLLOW. eu so criei eles aqui por conveniencia na hora de adicionar terminais aos follows de nao terminais
-                            (concatena os follows direto ao inves de ficar verificando se eh ou nao um terminal.
-                            se ficar ruim no futuro, da pra mudar; eh so para uso interno
-                             */
                         }
                         //3.
                         if (contemEps == true) {
