@@ -7,9 +7,9 @@ import analise_sintatica.gramatica.simbolo.Terminal;
 import java.util.*;
 
 public class Gramatica {
-    private final String simboloS;
+    private final String simboloS; //nao terminal inicial; agora eh string (antes era NaoTerminal)
     private final List<RegraProd> regras = new ArrayList<>();
-    private final Map<String, List<RegraProd>> regrasLadoEsq = new HashMap<>();
+    private final Map<String, List<RegraProd>> regrasLadoEsq = new HashMap<>(); //lista de strings associadas a uma lista de regras de producao
 
     private Gramatica(String simboloS) {
         this.simboloS = simboloS;
@@ -18,7 +18,7 @@ public class Gramatica {
     public void adicionarRegra(RegraProd regraProd) {
         regras.add(regraProd);
 
-        String naoTerminal = regraProd.getLadoEsq().getNome();
+        String naoTerminal = regraProd.getLadoEsq().getNome(); //como eh string, opera pelo nome
         List<RegraProd> lista;
 
         if(!regrasLadoEsq.containsKey(naoTerminal)) {
@@ -46,11 +46,11 @@ public class Gramatica {
 
         private final Gramatica gramatica;
 
-        public GramaticaBuilder(String simboloS) {
+        public GramaticaBuilder(String simboloS) { //construtor de gramatica
             this.gramatica = new Gramatica(simboloS);
         }
 
-        public GramaticaBuilder regra(String ladoEsq, String... ladoDir) {
+        public GramaticaBuilder regra(String ladoEsq, String... ladoDir) { //constutor de regra
             NaoTerminal nt = new NaoTerminal(ladoEsq);
             List<Simbolos> simbolosDir = new ArrayList<>();
 
@@ -60,6 +60,7 @@ public class Gramatica {
                 }
                 else {
                     simbolosDir.add(new Terminal(s.toUpperCase()));
+                    //terminais: inicial maiuscula
                 }
             }
 
@@ -72,9 +73,9 @@ public class Gramatica {
             return gramatica;
         }
 
-        private boolean ehNaoTerminal(String simbolo) {
+        public boolean ehNaoTerminal(String simbolo) {
             return Character.isUpperCase(simbolo.charAt(0));
-        }
+        } //identifica se eh nao terminal ao observar se o primeiro caractere eh minusculo
     }
 
 }

@@ -22,7 +22,7 @@ public class GramaticaTea {
         gramatica = builder.construirGramaticaTea();
     }
 
-    public void calcularFirst() {
+    public void calcularFirst(){
         /*
         passos:
         I) preencher terminais e nao terminais cujo primeiro eh terminal primeiro, depois nao terminais cujo primeiro eh nao terminal
@@ -91,17 +91,21 @@ public class GramaticaTea {
         }while(houveMudanca == true);
     }
 
+    private Set<String> obterFirst(String A){
+        return first.get(A);
+    }
+
     public void exibirFirsts() {
         for (Map.Entry<String, Set<String>> entry : first.entrySet()) {
             System.out.print("FIRST(" + entry.getKey() + ") = { ");
             for (String t : entry.getValue()) {
-                System.out.print((t != null ? t : "ε") + " ");
+                System.out.print(t + " ");
             }
             System.out.println("}");
         }
     }
 
-    private void calcularFollow() {
+    public void calcularFollow(){
         /*
         follow(A), onde A eh um nao terminal: conjunto de terminais a que podem aparecer imediatamente para a direita de A em alguma forma
         exemplo: S -> AaB
@@ -114,7 +118,7 @@ public class GramaticaTea {
         I) compute follow(A) for all non-terminals A
         II) apply these rules until nothing can be added to follow(A):
             1. place $ in follow(S) (S: simbolo nao terminal inicial)
-            2. se tiver uma producao A -> BC, entao tudo em first(c) exceto epsilon esta em follow(B)
+            2. se tiver uma producao A -> BC, entao tudo em first(C) exceto epsilon esta em follow(B)
             3. se tiver uma producao A -> zB ou uma producao A -> zBC, onde first(C) contem epsilon, entao tudo em follow(A) esta em follow(B)
          */
 
@@ -127,24 +131,67 @@ public class GramaticaTea {
         String S = gramatica.getRegras().get(0).getLadoEsq().getNome();
         follow.get(S).add("$");
 
-        boolean houveMudanca;
+        boolean houveMudanca, contemEps;
         do {
             houveMudanca = false;
-            for(RegraProd regra : gramatica.getRegras()){
-                String A = regra.getLadoEsq().getNome();
-                List<Simbolos> direita = regra.getLadoDir();
+            for(RegraProd regra : gramatica.getRegras()){ //para cada regra
+                String A = regra.getLadoEsq().getNome(); //A = lado esquerdo
+                List<Simbolos> direita = regra.getLadoDir(); //vamos analisar as regras
 
-                for(int i = 0; i < direita.size(); i++){
-                    Simbolos B = direita.get(i);
-                    String nome = B.getNome();
-                    Set<String> followB = follow.computeIfAbsent(nome, k -> new HashSet<>());
-                    int tamanhoOriginal = followB.size();
+                for(int i = 0; i < direita.size(); i++) { //para cada simbolo na direita
+                    Simbolos atual = direita.get(i);
 
-                    //2.
+                    if (!atual.ehTerminal()){
+                        String B = direita.get(i).getNome();
+                        Set<String> followB = follow.computeIfAbsent(B, k -> new HashSet<>());
+                        int tamanhoOriginal = followB.size();
+
+                        //2.
+                        contemEps = false;
+                        if (i + 1 < direita.size()) { //se tem alguma coisa depois do B
+
+                            String C = direita.get(i + 1).getNome();
+                            Set<String> firstC = obterFirst(C);
+                            if (firstC.remove("EPS")) {
+                                contemEps = true;
+                            }
+                            followB.addAll(firstC);
+                            /*
+                            nota: TERMINAIS NAO POSSUEM CONJUNTO FOLLOW. eu so criei eles aqui por conveniencia na hora de adicionar terminais aos follows de nao terminais
+                            (concatena os follows direto ao inves de ficar verificando se eh ou nao um terminal.
+                            se ficar ruim no futuro, da pra mudar; eh so para uso interno
+                             */
+                        }
+                        //3.
+                        if (contemEps == true) {
+                            followB.addAll(obterFollow(A));
+                        }
+                        //3.
+                        else { //se B eh o ultimo da producao A
+                            followB.addAll(obterFollow(A));
+                        }
+
+                        if (followB.size() > tamanhoOriginal) {
+                            houveMudanca = true;
+                        }
+                    }
                 }
             }
-
         }while(houveMudanca == false);
+    }
+
+    private Set<String> obterFollow(String A){
+        return follow.get(A);
+    }
+
+    public void exibirFollows(){
+        for (Map.Entry<String, Set<String>> entry : follow.entrySet()) {
+            System.out.print("FOLLOW(" + entry.getKey() + ") = { ");
+            for (String t : entry.getValue()) {
+                System.out.print(t + " ");
+            }
+            System.out.println("}");
+        }
     }
 
     public Gramatica getGramatica() {

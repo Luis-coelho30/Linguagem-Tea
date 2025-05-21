@@ -25,10 +25,11 @@ public class RegraProd {
 
     public List<Boolean> listarTerminaisDerivados() {
         List<Boolean> resultado = new ArrayList<>();
-        for (Simbolos simbolo : ladoDir) {
-            resultado.add(simbolo.ehTerminal());
+        for (Simbolos simbolo : ladoDir) { //para cada simbolo do lado direito
+            resultado.add(simbolo.ehTerminal()); //se for terminal, marca
         }
         return resultado;
     }
+    //lista as posicoes dos terminais derivados a partir de um nao-terminal em uma regra de producao
 
 }
