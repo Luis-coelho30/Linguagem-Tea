@@ -1,6 +1,5 @@
 package analise_sintatica.gramatica;
 
-import analise_sintatica.gramatica.simbolo.NaoTerminal;
 import analise_sintatica.gramatica.simbolo.Simbolos;
 
 import java.util.*;
@@ -14,81 +13,78 @@ public class GramaticaTea {
     public GramaticaTea() {
         construirGramatica();
         calcularFirst();
-        calcularFollow();
+        //calcularFollow();
     }
 
     private void construirGramatica() {
         GramaticaTeaBuilder builder = new GramaticaTeaBuilder();
         gramatica = builder.construirGramaticaTea();
+        derivamEpsilon.addAll(gramatica.getDerivamVazio());
     }
 
     public void calcularFirst(){
-        /*
-        passos:
-        I) preencher terminais e nao terminais cujo primeiro eh terminal primeiro, depois nao terminais cujo primeiro eh nao terminal
-        II) repetir o seguinte ate nenhuma alteracao ocorrer:
-	        - para cada nao terminal A, para cada producao A -> Bw, onde B pode ser terminal ou nao terminal e w eh uma cadeia qualquer, definir:
-		            FIRST(A) = FIRST(A) U FIRST(B)
-        */
-
-        //I)
-        for(RegraProd regra : gramatica.getRegras()){
-            String A = regra.getLadoEsq().getNome();
-            first.computeIfAbsent(A, k -> new HashSet<>());
-
-            for(Simbolos sim : regra.getLadoDir()){ //inicializa first de terminais
-                String nome = sim.getNome();
-                Set<String> firstSim = first.computeIfAbsent(nome, k -> new HashSet<>());
-                if(sim.ehTerminal() == true){
-                    firstSim.add(nome);
+        //I) Criar conjuntos FIRST e adicionar a cada conjunto seu primeiro terminal (se houver)
+        // Inicializa FIRST de terminais
+        for (RegraProd regra : gramatica.getRegras()) {
+            for (int i = 0; i < regra.getNomesSimbolosDir().size(); i++) {
+                String simb = regra.getNomeSimboloDir(i);
+                if (regra.simbEhTerminal(i)) {
+                    first.computeIfAbsent(simb, k -> new HashSet<>()).add(simb);
                 }
-            }
-            //provavelmente da pra simplificar essa funcao mas to com sono
-
-            List<Simbolos> direita = regra.getLadoDir();
-
-            Simbolos primeiroDir = direita.get(0);
-            if(primeiroDir.getNome().equals("eps")){
-                derivamEpsilon.add(A);
-                first.get(A).add(primeiroDir.getNome());
-            }
-            else if(primeiroDir.ehTerminal()) {
-                first.get(A).add(primeiroDir.getNome());
             }
         }
 
-        //II)
+        // Inicializa FIRST dos NT como vazios
+        for (RegraProd regra : gramatica.getRegras()) {
+            String A = regra.getLadoEsq().getNome();
+            first.computeIfAbsent(A, k -> new HashSet<>());
+        }
+
+        //II) Aos conjuntos cujo primeiro simbolo da derivacao nao for um terminal: FIRST(A) = FIRST(A) U FIRST(B) se A -> Bw;
+
         boolean houveMudanca;
+        //Inicia o loop externo que mantem o algoritmo em execucao ate que todos os FIRST tenham sido completados
         do{
             houveMudanca = false;
-            for(RegraProd regra : gramatica.getRegras()){ //terminais cujo primeiro eh nao terminal
+            //Para cada regra de producao
+            for (RegraProd regra : gramatica.getRegras()) {
+                //Pegue o nome do nao-terminal A associado
                 String A = regra.getLadoEsq().getNome();
-                Set<String> firstA = first.get(A); //recupera o conjunto atual (deve estar vazio)
-                int tamanhoOriginal = firstA.size(); //enquanto esse tamanho mudar, continua o loop
-                List<Simbolos> direita = regra.getLadoDir();
+                //Pegue o conjunto do nao-terminal A
+                Set<String> firstA = first.get(A);
+                //Pegue o tamanho original desse conjunto
+                int tamanhoOriginal = firstA.size();
 
+                //Pegue os nomes dos simbolos da derivacao de A
+                List<String> direita = regra.getNomesSimbolosDir();
+                //Assuma que todos derivam em Vazio
                 boolean todosDerivamEps = true;
-                for(Simbolos sim : direita){ //para cada simbolo, T ou NT, no lado direito
-                    Set<String> firstSimbolo = first.getOrDefault(sim.getNome(), Set.of()); //conjunto first desse T ou NT
-                    for(String terminal : firstSimbolo){ //para cada terminal desse conjunto first
-                        if(!terminal.equals("eps")){
+                //Para cada simbolo, se este derivar em vazio adicionar todos elementos do conjunto, menos o vazio
+                //First(A) = First(B) - { eps }
+                for (String simb : direita) {
+                    Set<String> firstSimb = first.getOrDefault(simb, Set.of());
+                    for (String terminal : firstSimb) {
+                        if (!terminal.equals("eps")) {
                             firstA.add(terminal);
                         }
                     }
-                    if(!derivamEpsilon.contains(sim.getNome())){
+                    //Se um simbolo nao derivar em vazio, termine o loop (fim do first)
+                    if (!derivamEpsilon.contains(simb)) {
                         todosDerivamEps = false;
                         break;
                     }
                 }
-                if((todosDerivamEps == true) && (!firstA.contains("eps"))){
+
+                //Se todos derivarem em vazio, entao First(A) = First(A) U { eps }
+                if (todosDerivamEps) {
                     firstA.add("eps");
-                    derivamEpsilon.add(A);
                 }
-                if(firstA.size() != tamanhoOriginal){
+
+                if (firstA.size() > tamanhoOriginal) {
                     houveMudanca = true;
                 }
             }
-        }while(houveMudanca == true);
+        }while(houveMudanca);
     }
 
     private Set<String> obterFirst(String A){
@@ -105,74 +101,88 @@ public class GramaticaTea {
         }
     }
 
-    public void calcularFollow(){
-        /*
-        follow(A), onde A eh um nao terminal: conjunto de terminais a que podem aparecer imediatamente para a direita de A em alguma forma
-        exemplo: S -> AaB
-
-        - simbolos podem existir entre A e a desde que derivem epsilon e desaparecam (por isso o hashmap derivamEpsilon)
-        - se A pode ser o simbolo rightmost em alguma forma, entao follow(A) = $ (indica fim da definicao)
-        - $ eh um simbolo especial que nao pertence a nenhuma gramatica
-
-        passos:
-        I) compute follow(A) for all non-terminals A
-        II) apply these rules until nothing can be added to follow(A):
-            1. place $ in follow(S) (S: simbolo nao terminal inicial)
-            2. se tiver uma producao A -> BC, entao tudo em first(C) exceto epsilon esta em follow(B)
-            3. se tiver uma producao A -> zB ou uma producao A -> zBC, onde first(C) contem epsilon, entao tudo em follow(A) esta em follow(B)
-         */
-
-        for(RegraProd regra : gramatica.getRegras()) {
+    public void calcularFollow() {
+        //Inicializa todos os conjuntos de nao-terminais Follow
+        for (RegraProd regra : gramatica.getRegras()) {
             String A = regra.getLadoEsq().getNome();
             follow.computeIfAbsent(A, k -> new HashSet<>());
         }
-
-        //1.
-        String S = gramatica.getRegras().get(0).getLadoEsq().getNome();
+        //1.O simbolo inicial da gramatica sempre deve conter o simbolo $ (indicador de fim de cadeia)
+        String S = gramatica.getSimboloS();
         follow.get(S).add("$");
 
-        boolean houveMudanca, contemEps;
+        boolean houveMudanca;
+        //Inicia loop externo para Follow que garante que todos os follows sejam atualizados (ja que cada Follow depende de outro)
         do {
             houveMudanca = false;
-            for(RegraProd regra : gramatica.getRegras()){ //para cada regra
-                String A = regra.getLadoEsq().getNome(); //A = lado esquerdo
-                List<Simbolos> direita = regra.getLadoDir(); //vamos analisar as regras
+            //Para cada regra de producao
+            for (RegraProd regra : gramatica.getRegras()) {
+                //Recolha A, o nao-terminal associado a regra
+                String A = regra.getLadoEsq().getNome();
+                //Recolha o conjunto de regras que possuam A na direita
+                List<RegraProd> ocorrenciasSimb = gramatica.getOcorrenciasSimb(A);
 
-                for(int i = 0; i < direita.size(); i++) { //para cada simbolo na direita
-                    Simbolos atual = direita.get(i);
+                if(ocorrenciasSimb == null) {
+                    continue;
+                }
 
-                    if (!atual.ehTerminal()){ //somente nao terminais tem conjunto follow
-                        String B = direita.get(i).getNome();
-                        Set<String> followB = follow.computeIfAbsent(B, k -> new HashSet<>());
-                        int tamanhoOriginal = followB.size();
+                for (RegraProd regraComA : ocorrenciasSimb) {
+                    int proxDeA = regraComA.getPosicaoSimb(A) + 1;
+                    //Salva o tamanho antigo para detectar mudanças
+                    int tamanhoAntigo = follow.get(A).size();
 
-                        //2.
-                        contemEps = false;
-                        if (i + 1 < direita.size()) { //se tem alguma coisa depois do B
-
-                            String C = direita.get(i + 1).getNome();
-                            Set<String> firstC = obterFirst(C);
-                            if (firstC.remove("EPS")) {
-                                contemEps = true;
+                    //1. Se A for o ultimo na derivacao, entao o FOLLOW do lado esquerdo sera selecionado
+                    if (proxDeA == regraComA.getLadoDir().size()) {
+                        follow.get(A).addAll(follow.get(regraComA.getLadoEsq().getNome()));
+                    }
+                    //2. Se o simbolo apos A for um terminal, entao Follow(A) = Follow(A) U { terminal }
+                    else if (regraComA.simbEhTerminal(proxDeA)) {
+                        String terminal = regraComA.getNomeSimboloDir(proxDeA);
+                        follow.get(A).add(terminal);
+                    }
+                    //3. Se o proximo de A for um nao-terminal B, entao Follow(A) = Follow(A) U First(B):
+                    else{
+                        String B = regraComA.getNomeSimboloDir(proxDeA);
+                        Set<String> firstB = first.get(B);
+                        //Adiciona todos os simbolos de First(B) ao Follow(A), menos o vazio
+                        for (String simb : firstB) {
+                            if (!simb.equals("eps")) {
+                                follow.get(A).add(simb);
                             }
-                            followB.addAll(firstC);
                         }
-                        //3.
-                        if (contemEps == true) {
-                            followB.addAll(obterFollow(A));
+                        //Se o First(B) conter o vazio, entao:
+                        int i = proxDeA;
+                        while (i < regraComA.getLadoDir().size() && first.get(regraComA.getNomeSimboloDir(i)).contains("eps")) {
+                            i++;
+                            // Se houver outro símbolo à frente
+                            if (i < regraComA.getLadoDir().size()) {
+                                String proxNome = regraComA.getNomeSimboloDir(i);
+                                //1. O proximo terminal depois do proximo simbolo sera adicionado ao FOLLOW
+                                if (regraComA.simbEhTerminal(i)) {
+                                    follow.get(A).add(proxNome);
+                                    break;
+                                }
+                                //2. O proximo FIRST do proximo nao terminal sera adicionado ao follow
+                                else {
+                                    for (String simb : first.get(proxNome)) {
+                                        if (!simb.equals("eps")) {
+                                            follow.get(A).add(simb);
+                                        }
+                                    }
+                                }
+                            } else {
+                                //3. Se B eh o ultimo simbolo da regra, entao Follow(A) = Follow(A) U Follow(ladoEsq)
+                                follow.get(A).addAll(follow.get(regraComA.getLadoEsq().getNome()));
+                            }
                         }
-                        //3.
-                        else { //se B eh o ultimo da producao A
-                            followB.addAll(obterFollow(A));
-                        }
-
-                        if (followB.size() > tamanhoOriginal) {
-                            houveMudanca = true;
-                        }
+                    }
+                    //Se o tamanho do conjunto mudou, houve mudança
+                    if (follow.get(A).size() > tamanhoAntigo) {
+                        houveMudanca = true;
                     }
                 }
             }
-        }while(houveMudanca == false);
+        } while (houveMudanca);
     }
 
     private Set<String> obterFollow(String A){
@@ -187,6 +197,8 @@ public class GramaticaTea {
             }
             System.out.println("}");
         }
+        System.out.println(" ");
+        System.out.println(" ");
     }
 
     public Gramatica getGramatica() {

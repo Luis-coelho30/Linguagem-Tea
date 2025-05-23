@@ -10,6 +10,8 @@ public class Gramatica {
     private final String simboloS; //nao terminal inicial; agora eh string (antes era NaoTerminal)
     private final List<RegraProd> regras = new ArrayList<>();
     private final Map<String, List<RegraProd>> regrasLadoEsq = new HashMap<>(); //lista de strings associadas a uma lista de regras de producao
+    private final Set<String> derivamVazio = new HashSet<>();
+    private Map<String, List<RegraProd>> ocorrenciasPorSimbolo = new HashMap<>();
 
     private Gramatica(String simboloS) {
         this.simboloS = simboloS;
@@ -22,7 +24,7 @@ public class Gramatica {
         List<RegraProd> lista;
 
         if(!regrasLadoEsq.containsKey(naoTerminal)) {
-            lista = new ArrayList<RegraProd>();
+            lista = new ArrayList<>();
             regrasLadoEsq.put(naoTerminal, lista);
         }
 
@@ -42,9 +44,26 @@ public class Gramatica {
         return regrasLadoEsq.getOrDefault(nt, Collections.emptyList());
     }
 
+    public void setOcorrenciasPorSimbolo(Map<String, List<RegraProd>> ocorrenciasPorSimbolo) {
+        this.ocorrenciasPorSimbolo = ocorrenciasPorSimbolo;
+    }
+
+    public List<RegraProd> getOcorrenciasSimb(String nt) {
+        return ocorrenciasPorSimbolo.get(nt);
+    }
+
+    public void addDerivamVazio(String naoTerminal) {
+        derivamVazio.add(naoTerminal);
+    }
+
+    public Set<String> getDerivamVazio() {
+        return derivamVazio;
+    }
+
     public static class GramaticaBuilder {
 
         private final Gramatica gramatica;
+        private final Map<String, List<RegraProd>> ocorrenciasPorSimbolo = new HashMap<>();
 
         public GramaticaBuilder(String simboloS) { //construtor de gramatica
             this.gramatica = new Gramatica(simboloS);
@@ -69,7 +88,27 @@ public class Gramatica {
             return this;
         }
 
+        public GramaticaBuilder marcarVazio(String naoTerminal) {
+            gramatica.addDerivamVazio(naoTerminal);
+            return this;
+        }
+
+        public GramaticaBuilder montarMapaDeOcorrencias() {
+            for (RegraProd regra : gramatica.getRegras()) {
+                for (Simbolos simb : regra.getLadoDir()) {
+                    if (!simb.ehTerminal()) {
+                        ocorrenciasPorSimbolo
+                                .computeIfAbsent(simb.getNome(), k -> new ArrayList<>())
+                                .add(regra);
+                    }
+                }
+            }
+
+            return this;
+        }
+
         public Gramatica build() {
+            gramatica.setOcorrenciasPorSimbolo(ocorrenciasPorSimbolo);
             return gramatica;
         }
 

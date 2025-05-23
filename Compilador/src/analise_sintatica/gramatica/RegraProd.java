@@ -23,6 +23,7 @@ public class RegraProd {
         return ladoDir;
     }
 
+    //lista as posicoes dos terminais derivados a partir de um nao-terminal em uma regra de producao
     public List<Boolean> listarTerminaisDerivados() {
         List<Boolean> resultado = new ArrayList<>();
         for (Simbolos simbolo : ladoDir) { //para cada simbolo do lado direito
@@ -30,6 +31,33 @@ public class RegraProd {
         }
         return resultado;
     }
-    //lista as posicoes dos terminais derivados a partir de um nao-terminal em uma regra de producao
+
+    public int getPosicaoSimb(String simbName) {
+        int i = 0;
+        while (i < ladoDir.size() && !getNomeSimboloDir(i).equals(simbName)) {
+            i++;
+        } if(i == ladoDir.size()) {
+            i = -1;
+        }
+
+        return i;
+    }
+
+    //Retorna o nome do simbolo da posicao i de uma producao
+    public String getNomeSimboloDir(int i) {
+        return ladoDir.get(i).getNome();
+    }
+
+    public List<String> getNomesSimbolosDir() {
+        List<String> nomes = new ArrayList<>();
+
+        ladoDir.forEach(simb -> nomes.add(simb.getNome()));
+
+        return nomes;
+    }
+
+    public boolean simbEhTerminal(int i) {
+        return getLadoDir().get(i).ehTerminal();
+    }
 
 }
