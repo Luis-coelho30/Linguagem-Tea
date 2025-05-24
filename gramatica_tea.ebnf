@@ -1,84 +1,83 @@
-programa ::= unidadesPreMain funcMain unidadesPosMain
+Programa ::= UnidadesPreMain FuncMain UnidadesPosMain
 
-unidadesPreMain ::= declGlobal unidadesPreMain | ε
+UnidadesPreMain ::= DeclStmt UnidadesPreMain | ε
 
-funcMain ::= "main" "(" ")" blocoStmt
+FuncMain ::= "main" "(" ")" BlocoStmt
 
-unidadesPosMain ::= funcDecl unidadesPosMain | ε
+UnidadesPosMain ::= FuncDecl UnidadesPosMain | ε
 
-declGlobal ::= type "id" declStmtSufixo
-
-funcDecl ::= typeORtypeArray "id" "(" paramList ")" blocoStmt
-paramList ::= param paramListTail | ε
-paramListTail ::= "," param paramListTail | ε
-param ::= type paramSufixo
-paramSufixo ::= "id" | "id" "[" "]"
+FuncDecl ::= TypeORtypeArray "id" "(" ParamList ")" BlocoStmt
+ParamList ::= Param ParamListTail | ε
+ParamListTail ::= "," Param ParamListTail | ε
+Param ::= Type ParamSufixo
+ParamSufixo ::= "id" | "id" "[" "]"
  
-stmt ::= declStmt | ifStmt | whileStmt | forStmt | doStmt | switchStmt | assignStmt | funcCallStmt | returnStmt | blocoStmt | breakStmt | emptyStmt
-stmtList ::= stmt stmtList | ε
+Stmt ::= "id" StmtIdTail ";" | DeclStmt | IfStmt | WhileStmt | ForStmt | DoStmt | SwitchStmt | ReturnStmt | BlocoStmt | BreakStmt | EmptyStmt
+StmtIdTail ::= "(" ArgList ")" | LValueSufixo "=" Expr
+StmtList ::= Stmt StmtList | ε
 
-declStmt ::= type "id" declStmtSufixo
-declStmtSufixo ::= "[" "in" "]" ";" | declStmt1
-declStmt1 ::= "=" expr ";" | ";"
+DeclStmt ::= Type "id" DeclStmtSufixo
+DeclStmtSufixo ::= "[" "in" "]" ";" | DeclStmt1
+DeclStmt1 ::= "=" Expr ";" | ";"
 
-typeORtypeArray ::= type | typeArray
-typeArray ::= type "[" "]"
-type ::= "int" | "float" | "double" | "char" | "boolean" 
+TypeORtypeArray ::= Type | TypeArray
+TypeArray ::= Type "[" "]"
+Type ::= "int" | "float" | "double" | "char" | "boolean" 
 
-ifStmt ::= "if" "(" expr ")" stmt elifList elsePart
-elifList ::= elif elifList | ε 
-elif ::= "elif" "(" expr ")" stmt
-elsePart ::= "else" stmt | ε
+IfStmt ::= "if" "(" Expr ")" Stmt ElifList ElsePart
+ElifList ::= elif ElifList | ε 
+Elif ::= "elif" "(" Expr ")" Stmt
+ElsePart ::= "else" Stmt | ε
 
-whileStmt ::= "while" "(" expr ")" stmt
+WhileStmt ::= "while" "(" Expr ")" Stmt
 
-forStmt ::= "for" "(" forInit forCond ";" forUpdate ")" stmt
-forInit ::= forAssign | declStmt | ";"
-forAssign ::= "id" "=" expr ";"
-forCond ::= expr | ε
-forUpdate ::= "id" "=" exprArit | ε
+ForStmt ::= "for" "(" ForInit ForCond ";" ForUpdate ")" Stmt
+ForInit ::= ForAssign | DeclStmt | ";"
+ForAssign ::= "id" "=" Expr ";"
+ForCond ::= Expr | ε
+ForUpdate ::= "id" "=" ExprArit | ε
 
-doStmt ::= "do" stmt "while" "(" expr ")" ";"
+DoStmt ::= "do" Stmt "while" "(" Expr ")" ";"
 
-switchStmt ::= "switch" "(" exprArit ")" "{" caseList defaultPart "}"
-caseList ::= caseClause caseList | ε
-caseClause ::= "case" exprArit ":" stmtList breakStmt
-breakStmt ::= "break" ";" 
-defaultPart ::= "default" ":" stmtList | ε
+SwitchStmt ::= "switch" "(" ExprArit ")" "{" CaseList DefaultPart "}"
+CaseList ::= caseClause CaseList | ε
+CaseClause ::= "case" ExprArit ":" StmtList BreakStmt
+BreakStmt ::= "break" ";" 
+DefaultPart ::= "default" ":" StmtList | ε
 
-assignStmt ::= "id" "=" assignExpr ";"
+ReturnStmt ::= "return" ReturnExpr ";"
+ReturnExpr ::= Expr | ε 
 
-funcCallStmt ::= "id" "(" argList ")" ";"
+BlocoStmt ::= "{" StmtList "}"
 
-returnStmt ::= "return" returnExpr ";"
-returnExpr ::= expr | ε 
+EmptyStmt ::= ";"
 
-blocoStmt ::= "{" stmtList "}"
+Expr -> LValue "=" Expr | ExprLog
 
-emptyStmt ::= ";"
+LValue -> "id" LValueSufixo
+LValueSufixo -> "[" "num" "]" | ε
 
-expr ::= assignExpr
+ExprLog -> ExprRel ExprLog'
+ExprLog' -> ("AND" | "OR") ExprRel ExprLog' | ε
 
-assignExpr ::= "id" "=" assignExpr | exprLog
+ExprRel -> ExprComp ExprRel'
+ExprRel' -> ("==" | "!=") ExprComp ExprRel' | ε
 
-exprLog ::= exprRel exprLog1
-exprLog1 ::= "AND" exprRel exprLog1 | "OR" exprRel exprLog1 | ε
+ExprComp -> ExprNot ExprComp'
+ExprComp' -> ("<" | "<=" | ">" | ">=") ExprArit | ε
 
-exprRel ::= exprComp exprRel1
-exprRel1 ::= "==" exprComp exprRel1 | "!=" exprComp exprRel1 | ε
+ExprNot -> "!" ExprNot | ExprArit
 
-exprComp ::= exprNot exprComp1
-exprComp1 ::= "<" exprArit | "<=" exprArit | ">" exprArit | ">=" exprArit | ε
+ExprArit -> Termo ExprArit'
+ExprArit' -> ("+" | "-") Termo ExprArit' | ε
 
-exprNot ::= "!" exprNot | exprArit
+Termo -> Fator Termo'
+Termo' -> ("*" | "/") Fator Termo' | ε
 
-exprArit ::= termo exprArit1
-exprArit1 ::= "+" termo exprArit1 | "-" termo exprArit1 | ε
-termo ::= fator termo1
-termo1 ::= "*" fator termo1 | "/" fator termo1 | ε
-fator ::= "(" expr ")" | num | "id" fatorSufixo | "true" | "false" 
-fatorSufixo ::= "(" argList ")" | "[" "in" "]" | ε
-argList ::= expr argListTail | ε
-argListTail ::= "," expr argListTail | ε
+Fator -> "(" Expr ")" | "num" | "true" | "false" | "id" FatorSufixo
 
-num ::= "in" | "pf"
+FatorSufixo -> "(" ArgList ")" | "[" "num" "]" | ε
+
+argList -> Expr ArgListTail | ε
+
+argListTail -> "," Expr ArgListTail | ε
