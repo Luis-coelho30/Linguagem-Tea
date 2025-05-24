@@ -44,7 +44,7 @@ public class Gramatica {
         return regrasLadoEsq.getOrDefault(nt, Collections.emptyList());
     }
 
-    public void setOcorrenciasPorSimbolo(Map<String, List<RegraProd>> ocorrenciasPorSimbolo) {
+    private void setOcorrenciasPorSimbolo(Map<String, List<RegraProd>> ocorrenciasPorSimbolo) {
         this.ocorrenciasPorSimbolo = ocorrenciasPorSimbolo;
     }
 

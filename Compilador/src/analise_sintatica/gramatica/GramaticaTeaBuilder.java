@@ -7,15 +7,13 @@ public class GramaticaTeaBuilder {
         Gramatica gramatica = new Gramatica.GramaticaBuilder("Programa")
                                             .regra("Programa", "UnidadesPreMain", "FuncMain", "UnidadesPosMain")
 
-                                            .regra("UnidadesPreMain", "DeclGlobal", "UnidadesPreMain")
+                                            .regra("UnidadesPreMain", "DeclStmt", "UnidadesPreMain")
                                             .regra("UnidadesPreMain", "eps").marcarVazio("UnidadesPreMain")
 
                                             .regra("FuncMain", "main", "paren_esq", "paren_dir", "BlocoStmt")
 
                                             .regra("UnidadesPosMain", "FuncDecl", "UnidadesPosMain")
                                             .regra("UnidadesPosMain", "eps").marcarVazio("UnidadesPosMain")
-
-                                            .regra("DeclGlobal", "Type", "identificador")
 
                                             .regra("FuncDecl", "TypeORtypeArray", "identificador", "paren_esq", "ParamList", "paren_dir", "BlocoStmt")
                                             .regra("ParamList", "Param", "ParamListTail")
@@ -26,18 +24,19 @@ public class GramaticaTeaBuilder {
                                             .regra("ParamSufixo", "identificador")
                                             .regra("ParamSufixo", "identificador", "colchete_esq", "colchete_dir")
 
+                                            .regra("Stmt", "identificador", "StmtIdTail", "terminal")
                                             .regra("Stmt", "DeclStmt")
                                             .regra("Stmt", "IfStmt")
                                             .regra("Stmt", "WhileStmt")
                                             .regra("Stmt", "ForStmt")
                                             .regra("Stmt", "DoStmt")
                                             .regra("Stmt", "SwitchStmt")
-                                            .regra("Stmt", "AssignStmt")
-                                            .regra("Stmt", "FuncCallStmt")
                                             .regra("Stmt", "ReturnStmt")
                                             .regra("Stmt", "BlocoStmt")
                                             .regra("Stmt", "BreakStmt")
                                             .regra("Stmt", "EmptyStmt")
+                                            .regra("StmtIdTail", "paren_esq", "ArgList", "paren_dir")
+                                            .regra("StmtIdTail", "LValueSufixo", "atribuicao", "Expr")
                                             .regra("StmtList", "Stmt", "StmtList")
                                             .regra("StmtList", "eps").marcarVazio("StmtList")
 
@@ -85,10 +84,6 @@ public class GramaticaTeaBuilder {
                                             .regra("DefaultPart", "default", "dois_pontos", "StmtList")
                                             .regra("DefaultPart", "eps").marcarVazio("DefaultPart")
 
-                                            .regra("AssignStmt", "identificador", "atribuicao", "AssignExpr", "terminal")
-
-                                            .regra("FuncCallStmt", "identificador", "paren_esq", "ArgList", "paren_dir", "terminal")
-
                                             .regra("ReturnStmt", "return", "ReturnExpr", "terminal")
                                             .regra("ReturnExpr", "Expr")
                                             .regra("ReturnExpr", "eps").marcarVazio("ReturnExpr")
@@ -97,10 +92,12 @@ public class GramaticaTeaBuilder {
 
                                             .regra("EmptyStmt", "terminal")
 
-                                            .regra("Expr", "AssignExpr")
+                                            .regra("Expr", "LValue", "atribuicao", "Expr")
+                                            .regra("Expr", "ExprLog")
 
-                                            .regra("AssignExpr", "identificador", "atribuicao", "AssignExpr")
-                                            .regra("AssignExpr", "ExprLog")
+                                            .regra("LValue", "identificador", "LValueSufixo")
+                                            .regra("LValueSufixo", "colchete_esq", "numero", "colchete_dir")
+                                            .regra("LValueSufixo", "eps").marcarVazio("LValueSufixo")
 
                                             .regra("ExprLog", "ExprRel", "ExprLog1")
                                             .regra("ExprLog1", "and", "ExprRel", "ExprLog1")

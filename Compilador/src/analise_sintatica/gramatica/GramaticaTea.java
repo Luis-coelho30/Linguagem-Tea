@@ -1,13 +1,12 @@
 package analise_sintatica.gramatica;
 
-import analise_sintatica.gramatica.simbolo.Simbolos;
-
 import java.util.*;
 
 public class GramaticaTea {
     private Gramatica gramatica;
-    private final Map<String, Set<String>> first = new HashMap<>(); //set de strings agora
-    private final Map<String, Set<String>> follow = new HashMap<>(); //set de strings agora
+    private final Map<String, Set<String>> first = new HashMap<>(); //Map de strings (NT) para um Set de Strings (T) -> associa um NT a um conjunto de terminais como conjunto first
+    private final Map<String, Set<String>> follow = new HashMap<>(); //Map de strings (NT) para um Set de Strings (T) -> associa um NT a um conjunto de terminais como conjunto follow
+    private final Map<String, Map<String, RegraProd>> tabelaLL1 = new HashMap<>(); //Um map de strings (NT) para um Map de strings (T) para regras de producao
     private final Set<String> derivamEpsilon = new HashSet<>();
 
     public GramaticaTea() {
@@ -115,69 +114,59 @@ public class GramaticaTea {
         //Inicia loop externo para Follow que garante que todos os follows sejam atualizados (ja que cada Follow depende de outro)
         do {
             houveMudanca = false;
-            //Para cada regra de producao
-            for (RegraProd regra : gramatica.getRegras()) {
-                //Recolha A, o nao-terminal associado a regra
-                String A = regra.getLadoEsq().getNome();
+            //Para cada nao terminal no conjunto follow
+            for (String naoTerminal : follow.keySet()) {
                 //Recolha o conjunto de regras que possuam A na direita
-                List<RegraProd> ocorrenciasSimb = gramatica.getOcorrenciasSimb(A);
+                List<RegraProd> ocorrenciasSimb = gramatica.getOcorrenciasSimb(naoTerminal);
 
                 if(ocorrenciasSimb == null) {
                     continue;
                 }
 
-                for (RegraProd regraComA : ocorrenciasSimb) {
-                    int proxDeA = regraComA.getPosicaoSimb(A) + 1;
+                for (RegraProd regraProd : ocorrenciasSimb) {
+                    int proxDeNT = regraProd.getPosicaoSimb(naoTerminal) + 1;
                     //Salva o tamanho antigo para detectar mudanças
-                    int tamanhoAntigo = follow.get(A).size();
+                    int tamanhoAntigo = follow.get(naoTerminal).size();
+                    //Recolha o tamanho do lado direito
+                    int ladoDirSize = regraProd.getLadoDir().size();
 
                     //1. Se A for o ultimo na derivacao, entao o FOLLOW do lado esquerdo sera selecionado
-                    if (proxDeA == regraComA.getLadoDir().size()) {
-                        follow.get(A).addAll(follow.get(regraComA.getLadoEsq().getNome()));
+                    if (proxDeNT == ladoDirSize) {
+                        follow.get(naoTerminal).addAll(follow.get(regraProd.getLadoEsq().getNome()));
                     }
                     //2. Se o simbolo apos A for um terminal, entao Follow(A) = Follow(A) U { terminal }
-                    else if (regraComA.simbEhTerminal(proxDeA)) {
-                        String terminal = regraComA.getNomeSimboloDir(proxDeA);
-                        follow.get(A).add(terminal);
+                    else if (regraProd.simbEhTerminal(proxDeNT)) {
+                        follow.get(naoTerminal).add(regraProd.getNomeSimboloDir(proxDeNT));
                     }
                     //3. Se o proximo de A for um nao-terminal B, entao Follow(A) = Follow(A) U First(B):
                     else{
-                        String B = regraComA.getNomeSimboloDir(proxDeA);
-                        Set<String> firstB = first.get(B);
-                        //Adiciona todos os simbolos de First(B) ao Follow(A), menos o vazio
-                        for (String simb : firstB) {
-                            if (!simb.equals("eps")) {
-                                follow.get(A).add(simb);
-                            }
-                        }
-                        //Se o First(B) conter o vazio, entao:
-                        int i = proxDeA;
-                        while (i < regraComA.getLadoDir().size() && first.get(regraComA.getNomeSimboloDir(i)).contains("eps")) {
-                            i++;
-                            // Se houver outro símbolo à frente
-                            if (i < regraComA.getLadoDir().size()) {
-                                String proxNome = regraComA.getNomeSimboloDir(i);
-                                //1. O proximo terminal depois do proximo simbolo sera adicionado ao FOLLOW
-                                if (regraComA.simbEhTerminal(i)) {
-                                    follow.get(A).add(proxNome);
-                                    break;
-                                }
-                                //2. O proximo FIRST do proximo nao terminal sera adicionado ao follow
-                                else {
-                                    for (String simb : first.get(proxNome)) {
-                                        if (!simb.equals("eps")) {
-                                            follow.get(A).add(simb);
-                                        }
+                        //Se o nao-terminal B conter eps
+                        if(derivamEpsilon.contains(regraProd.getNomeSimboloDir(proxDeNT))) {
+                            int cursor = proxDeNT;
+                            do {
+                                for (String simb : first.get(regraProd.getNomeSimboloDir(cursor))) {
+                                    if(!simb.equals("EPS")) {
+                                        follow.get(naoTerminal).add(simb);
                                     }
                                 }
-                            } else {
-                                //3. Se B eh o ultimo simbolo da regra, entao Follow(A) = Follow(A) U Follow(ladoEsq)
-                                follow.get(A).addAll(follow.get(regraComA.getLadoEsq().getNome()));
+                                cursor++;
+                            }while(cursor < ladoDirSize && derivamEpsilon.contains(regraProd.getNomeSimboloDir(proxDeNT)));
+                            //Se acabaram os simbolos, entao NT pode ser o simbolo mais a direita, entao Follow(NT) = Follow(NT) + Follow(ladoEsq)
+                            if(cursor == ladoDirSize) {
+                                follow.get(naoTerminal).addAll(follow.get(regraProd.getLadoEsq().getNome()));
                             }
+                            //Encontrou-se um simbolo sem eps, entao Follow(A) = Follow(A) U First(B):
+                            else {
+                                follow.get(naoTerminal).addAll(first.get(regraProd.getNomeSimboloDir(cursor)));
+                            }
+                        }
+                        //Senao:
+                        else {
+                            follow.get(naoTerminal).addAll(first.get(regraProd.getNomeSimboloDir(proxDeNT)));
                         }
                     }
                     //Se o tamanho do conjunto mudou, houve mudança
-                    if (follow.get(A).size() > tamanhoAntigo) {
+                    if (follow.get(naoTerminal).size() > tamanhoAntigo) {
                         houveMudanca = true;
                     }
                 }
@@ -197,8 +186,36 @@ public class GramaticaTea {
             }
             System.out.println("}");
         }
-        System.out.println(" ");
-        System.out.println(" ");
+    }
+
+    private void construirTabelaLL1(){
+        /*
+            Para cada produção A → alfa da gramática, faça o seguinte:
+            1. Para cada terminal a em FIRST(A), inclua A → alfa em M[A,a].
+            2. Se EPS pertence a FIRST(alfa), inclua A → alfa em M[A,b] para cada terminal b em FOLLOW(A).
+            Se $ pertence a FIRST(A) e $ pertence a FOLLOW(A), acrescente também A → alfa em M[A,$].
+         */
+        //Para cada Regra da linguagem
+        for(RegraProd regraProd : gramatica.getRegras()) {
+            //Obter o NT da esquerda
+            String A = regraProd.getLadoEsq().getNome();
+
+            for(String simb : regraProd.getNomesSimbolosDir()) {
+
+            }
+
+
+        }
+    }
+
+    private Set<String> obterFirstAlfa(List<String> alfa) {
+        Set<String> firstAlfa = new HashSet<>();
+
+        for(String simb : alfa) {
+
+        }
+
+        return firstAlfa;
     }
 
     public Gramatica getGramatica() {
