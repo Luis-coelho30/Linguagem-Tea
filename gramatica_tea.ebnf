@@ -1,61 +1,60 @@
-Programa ::= UnidadesPreMain FuncMain UnidadesPosMain
+Programa -> PontoDeEntrada
 
-UnidadesPreMain ::= DeclStmt UnidadesPreMain | ε
+PontoDeEntrada -> DeclStmt PontoDeEntrada | FuncMain FuncDeclList
 
-FuncMain ::= "main" "(" ")" BlocoStmt
+FuncMain -> "main" "(" ")" BlocoStmt
 
-UnidadesPosMain ::= FuncDecl UnidadesPosMain | ε
+FuncDeclList -> FuncDecl FuncDeclList | ε
 
-FuncDecl ::= TypeORtypeArray "id" "(" ParamList ")" BlocoStmt
-ParamList ::= Param ParamListTail | ε
-ParamListTail ::= "," Param ParamListTail | ε
-Param ::= Type ParamSufixo
-ParamSufixo ::= "id" | "id" "[" "]"
+FuncDecl -> TypeORtypeArray "id" "(" ParamList ")" BlocoStmt
+ParamList -> Param ParamListTail | ε
+ParamListTail -> "," Param ParamListTail | ε
+Param -> Type "id" ParamSufixo
+ParamSufixo -> "[" "]" | ε
  
-Stmt ::= "id" StmtIdTail ";" | DeclStmt | IfStmt | WhileStmt | ForStmt | DoStmt | SwitchStmt | ReturnStmt | BlocoStmt | BreakStmt | EmptyStmt
-StmtIdTail ::= "(" ArgList ")" | LValueSufixo "=" Expr
-StmtList ::= Stmt StmtList | ε
+Stmt -> "id" StmtIdTail ";" | DeclStmt | IfStmt | WhileStmt | ForStmt | DoStmt | SwitchStmt | ReturnStmt | BlocoStmt | BreakStmt | EmptyStmt
+StmtIdTail -> "(" ArgList ")" | "[" "num" "]" "=" Expr | "=" Expr
 
-DeclStmt ::= Type "id" DeclStmtSufixo
-DeclStmtSufixo ::= "[" "in" "]" ";" | DeclStmt1
-DeclStmt1 ::= "=" Expr ";" | ";"
+DeclStmt -> Type "id" DeclStmtSufixo
+DeclStmtSufixo -> "[" "in" "]" ";" | DeclStmt1
+DeclStmt1 -> "=" Expr ";" | ";"
 
-TypeORtypeArray ::= Type | TypeArray
-TypeArray ::= Type "[" "]"
-Type ::= "int" | "float" | "double" | "char" | "boolean" 
+TypeORtypeArray -> Type TypeSufixo
+TypeSufixo -> "[" "]" | ε
+Type -> "int" | "float" | "double" | "char" | "boolean" 
 
-IfStmt ::= "if" "(" Expr ")" Stmt ElifList ElsePart
-ElifList ::= elif ElifList | ε 
-Elif ::= "elif" "(" Expr ")" Stmt
-ElsePart ::= "else" Stmt | ε
+IfStmt -> "if" "(" Expr ")" Stmt ElifORElse
+ElifORElse -> "elif" "(" Expr ")" Stmt ElifORElse | "else" Stmt | ε
 
-WhileStmt ::= "while" "(" Expr ")" Stmt
+WhileStmt -> "while" "(" Expr ")" Stmt
 
-ForStmt ::= "for" "(" ForInit ForCond ";" ForUpdate ")" Stmt
-ForInit ::= ForAssign | DeclStmt | ";"
-ForAssign ::= "id" "=" Expr ";"
-ForCond ::= Expr | ε
-ForUpdate ::= "id" "=" ExprArit | ε
+ForStmt -> "for" "(" ForInit ";" ForCond ";" ForUpdate ")" Stmt
+ForInit -> Type "id" "=" Expr | "id" "=" Expr | ε
+ForCond -> Expr | ε
+ForUpdate -> "id" "=" ExprArit | ε
 
-DoStmt ::= "do" Stmt "while" "(" Expr ")" ";"
+DoStmt -> "do" Stmt "while" "(" Expr ")" ";"
 
-SwitchStmt ::= "switch" "(" ExprArit ")" "{" CaseList DefaultPart "}"
-CaseList ::= caseClause CaseList | ε
-CaseClause ::= "case" ExprArit ":" StmtList BreakStmt
-BreakStmt ::= "break" ";" 
-DefaultPart ::= "default" ":" StmtList | ε
+SwitchStmt -> "switch" "(" ExprArit ")" "{" CaseSectionList "}"
+CaseSectionList -> CaseSection CaseSectionList | ε
+CaseSection -> CaseLabels CaseBody
+CaseLabels -> "case" ExprArit ":" CaseLabels | "default" ":"
+CaseBody -> Stmt CaseBody | ε
 
-ReturnStmt ::= "return" ReturnExpr ";"
-ReturnExpr ::= Expr | ε 
+BreakStmt -> "break" ";"
 
-BlocoStmt ::= "{" StmtList "}"
+ReturnStmt -> "return" ReturnExpr ";"
+ReturnExpr -> Expr | ε 
 
-EmptyStmt ::= ";"
+BlocoStmt -> "{" BlocoInstList "}"
+BlocoInstList -> BlocoInst BlocoInstList | ε
+BlocoInst -> Stmt 
 
-Expr -> LValue "=" Expr | ExprLog
+EmptyStmt -> ";"
 
-LValue -> "id" LValueSufixo
-LValueSufixo -> "[" "num" "]" | ε
+Expr -> ExprLog ExprSufixo
+
+ExprSufixo -> "=" Expr | ε
 
 ExprLog -> ExprRel ExprLog'
 ExprLog' -> ("AND" | "OR") ExprRel ExprLog' | ε
