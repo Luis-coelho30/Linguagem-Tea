@@ -10,12 +10,7 @@ public class Main {
          */
 
         GramaticaTea analisador = new GramaticaTea();
-        //analisador.calcularFirst();
 
-        //analisador.exibirFirsts();
-
-        analisador.calcularFollow();
-
-        analisador.exibirFollows();
+        analisador.imprimirTabelaLL1();
     }
 }
