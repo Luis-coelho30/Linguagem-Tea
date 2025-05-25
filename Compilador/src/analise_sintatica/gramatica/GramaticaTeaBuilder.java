@@ -122,13 +122,13 @@ public class GramaticaTeaBuilder {
                                             .regra("ExprNot", "ExprArit")
 
                                             .regra("ExprArit", "Termo", "ExprArit1")
-                                            .regra("ExprArit1", "soma", "ExprArit1")
-                                            .regra("ExprArit1", "sub", "ExprArit1")
+                                            .regra("ExprArit1", "soma", "Termo", "ExprArit1")
+                                            .regra("ExprArit1", "sub", "Termo", "ExprArit1")
                                             .regra("ExprArit1", "eps").marcarVazio("ExprArit1")
 
                                             .regra("Termo", "Fator", "Termo1")
-                                            .regra("Termo1", "mul", "Termo1")
-                                            .regra("Termo1", "div", "Termo1")
+                                            .regra("Termo1", "mul", "Fator", "Termo1")
+                                            .regra("Termo1", "div", "Fator", "Termo1")
                                             .regra("Termo1", "eps").marcarVazio("Termo1")
 
                                             .regra("Fator", "paren_esq", "Expr", "paren_dir")

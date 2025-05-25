@@ -95,6 +95,6 @@ public class Parser {
 
     public static void main(String[] args) {
         Parser parser = new Parser();
-        parser.analisarSintaxe("main() {}");
+        parser.analisarSintaxe("main() {int x = 5 + 53;}");
     }
 }
