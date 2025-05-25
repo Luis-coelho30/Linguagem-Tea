@@ -23,8 +23,9 @@ TypeORtypeArray -> Type TypeSufixo
 TypeSufixo -> "[" "]" | ε
 Type -> "int" | "float" | "double" | "char" | "boolean" 
 
-IfStmt -> "if" "(" Expr ")" Stmt ElifORElse
-ElifORElse -> "elif" "(" Expr ")" Stmt ElifORElse | "else" Stmt | ε
+IfStmt -> "if" "(" Expr ")" Stmt OptionalElif
+OptionalElif -> "elif" "(" Expr ")" Stmt OptionalElif | OptionalElse
+OptionalElse -> "else" Stmt | ε
 
 WhileStmt -> "while" "(" Expr ")" Stmt
 
