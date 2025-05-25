@@ -22,7 +22,7 @@ public class GramaticaTea {
         derivamEpsilon.addAll(gramatica.getDerivamVazio());
     }
 
-    public void calcularFirst(){
+    private void calcularFirst(){
         //I) Criar conjuntos FIRST e adicionar a cada conjunto seu primeiro terminal (se houver)
         // Inicializa FIRST de terminais
         for (RegraProd regra : gramatica.getRegras()) {
@@ -87,21 +87,7 @@ public class GramaticaTea {
         }while(houveMudanca);
     }
 
-    private Set<String> obterFirst(String A){
-        return first.get(A);
-    }
-
-    public void exibirFirsts() {
-        for (Map.Entry<String, Set<String>> entry : first.entrySet()) {
-            System.out.print("FIRST(" + entry.getKey() + ") = { ");
-            for (String t : entry.getValue()) {
-                System.out.print(t + " ");
-            }
-            System.out.println("}");
-        }
-    }
-
-    public void calcularFollow() {
+    private void calcularFollow() {
         //Inicializa todos os conjuntos de nao-terminais Follow
         for (RegraProd regra : gramatica.getRegras()) {
             String A = regra.getLadoEsq().getNome();
@@ -175,21 +161,7 @@ public class GramaticaTea {
         } while (houveMudanca);
     }
 
-    private Set<String> obterFollow(String A){
-        return follow.get(A);
-    }
-
-    public void exibirFollows(){
-        for (Map.Entry<String, Set<String>> entry : follow.entrySet()) {
-            System.out.print("FOLLOW(" + entry.getKey() + ") = { ");
-            for (String t : entry.getValue()) {
-                System.out.print(t + " ");
-            }
-            System.out.println("}");
-        }
-    }
-
-    public void construirTabelaLL1() {
+    private void construirTabelaLL1() {
         for (RegraProd regraProd : gramatica.getRegras()) {
             String A = regraProd.getLadoEsq().getNome();
             tabelaLL1.computeIfAbsent(A, k -> new HashMap<>());
@@ -208,7 +180,7 @@ public class GramaticaTea {
             }
 
             // 2. Se EPS ∈ FIRST(alfa), adiciona para cada b ∈ FOLLOW(A)
-            if (firstAlfa.contains("eps")) {
+            if (firstAlfa.contains("EPS")) {
                 for (String b : follow.get(A)) {
                     if (tabelaLL1.get(A).containsKey(b)) {
                         System.err.println("⚠️ Conflito LL(1): M[" + A + ", " + b + "] já contém "
@@ -223,36 +195,41 @@ public class GramaticaTea {
 
     private Set<String> obterFirstAlfa(RegraProd regraProd) {
         Set<String> firstAlfa = new HashSet<>();
-        List<String> alfa = regraProd.getNomesSimbolosDir();
-        //Se o primeiro simbolo for terminal, entao First(alfa) = { T }
-        if(regraProd.simbEhTerminal(0)) {
-            firstAlfa.add(regraProd.getNomeSimboloDir(0));
-        }
-        //Senao se o primeiro simbolo em alfa conter o vazio:
-        else if(derivamEpsilon.contains(regraProd.getNomeSimboloDir(0))) {
-            int cursor = 0;
-            int ladoDirSize = regraProd.getLadoDir().size();
-            //Para cada simbolo em alfa que derive em eps adicione os terminais do first
-            do {
-                for(String simb : first.get(regraProd.getNomeSimboloDir(cursor))) {
-                    if(!simb.equals("EPS")) {
-                        firstAlfa.add(simb);
-                    }
-                }
-                cursor++;
-            }while (cursor < ladoDirSize && derivamEpsilon.contains(regraProd.getNomeSimboloDir(cursor)));
-            //Se o cursor chegou ao fim da cadeia alfa, entao todos simbolos em alfa derivam em eps, portanto First(alfa) = First(alfa) U { eps }
-            if(cursor == ladoDirSize) {
-                firstAlfa.add("eps");
-            }
-        }
-        //Se o primeiro simbolo em alfa nao possuir eps, entao First(alfa) = First(simb)
-        else {
-            firstAlfa.addAll(first.get(regraProd.getNomeSimboloDir(0)));
-        }
+        List<String> alfa = regraProd.getNomesSimbolosDir(); // α = lado direito da produção
+        int i = 0;
+        boolean todosDerivamEps = true;
 
+        while (i < alfa.size()) {
+            String simbolo = alfa.get(i);
+            // Se é terminal, adiciona direto e para
+            if (regraProd.simbEhTerminal(i)) {
+                firstAlfa.add(simbolo);
+                todosDerivamEps = false;
+                break;
+            }
+
+            // É não-terminal: adiciona seu FIRST, sem o 'eps'
+            Set<String> firstSimbolo = first.getOrDefault(simbolo, Set.of());
+            for (String f : firstSimbolo) {
+                if (!f.equals("EPS")) {
+                    firstAlfa.add(f);
+                }
+            }
+            // Se esse símbolo não deriva eps, pare
+            if (!derivamEpsilon.contains(simbolo)) {
+                todosDerivamEps = false;
+                break;
+            }
+
+            i++;
+        }
+        // Se todos os símbolos de α derivam ε, então adiciona ε ao FIRST(α)
+        if (todosDerivamEps) {
+            firstAlfa.add("EPS");
+        }
         return firstAlfa;
     }
+
 
     public void imprimirTabelaLL1() {
         System.out.println("===== TABELA LL(1) =====");
@@ -267,6 +244,25 @@ public class GramaticaTea {
         }
     }
 
+    public void exibirFollows(){
+        for (Map.Entry<String, Set<String>> entry : follow.entrySet()) {
+            System.out.print("FOLLOW(" + entry.getKey() + ") = { ");
+            for (String t : entry.getValue()) {
+                System.out.print(t + " ");
+            }
+            System.out.println("}");
+        }
+    }
+
+    public void exibirFirsts() {
+        for (Map.Entry<String, Set<String>> entry : first.entrySet()) {
+            System.out.print("FIRST(" + entry.getKey() + ") = { ");
+            for (String t : entry.getValue()) {
+                System.out.print(t + " ");
+            }
+            System.out.println("}");
+        }
+    }
 
     public Gramatica getGramatica() {
         return gramatica;
@@ -278,5 +274,26 @@ public class GramaticaTea {
 
     public Map<String, Set<String>> getFollow() {
         return follow;
+    }
+
+    public List<String> obterProducao(String naoTerminal, String simboloEntrada) {
+        //A saida
+        List<String> producao = null;
+        //As regras definidas de um naoTerminal na tabelaLL1
+        Map<String, RegraProd> entradas = tabelaLL1.get(naoTerminal);
+        //Se o nao terminal existe na tabela
+        if (entradas != null) {
+            RegraProd regra = entradas.get(simboloEntrada);
+            //Se existe uma regra desse nao terminal para o token de entrada
+            if(regra != null) {
+                if(regra.getNomesSimbolosDir().getFirst().equals("EPS")) {
+                    producao = List.of();
+                } else {
+                    producao = regra.getNomesSimbolosDir();
+                }
+            }
+        }
+
+        return producao;
     }
 }
