@@ -54,11 +54,11 @@ public class GramaticaTeaBuilder {
                                             .regra("Type", "char")
                                             .regra("Type", "boolean")
 
-                                            .regra("IfStmt", "if", "paren_esq", "Expr", "paren_dir", "Stmt", "OptionalElif")
-                                            .regra("OptionalElif", "elif", "paren_esq", "Expr", "paren_dir", "Stmt", "OptionalElif")
+                                            .regra("IfStmt", "if", "paren_esq", "Expr", "paren_dir", "BlocoStmt", "OptionalElif")
+                                            .regra("OptionalElif", "elif", "paren_esq", "Expr", "paren_dir", "BlocoStmt", "OptionalElif")
                                             .regra("OptionalElif", "OptionalElse")
-                                            .regra("OptionalElse", "else", "Stmt")
-                                            .regra("ElifORElse", "eps").marcarVazio("ElifORElse")
+                                            .regra("OptionalElse", "else", "BlocoStmt")
+                                            .regra("OptionalElse", "eps").marcarVazio("OptionalElse")
 
 
                                             .regra("WhileStmt", "while", "paren_esq", "Expr", "paren_dir", "Stmt")
