@@ -139,7 +139,7 @@ public class Parser {
             break;
 
             case "ExprNot":
-                if(tokenAtual.getLexema().equals("NOT")) {
+                if(pilha.peek().equals("NOT")) {
                     ExprUnNode novaNegacao = new ExprUnNode("!", null);
                     pilhaAST.push(novaNegacao);
                     arvoreNaoTerminada = true;
