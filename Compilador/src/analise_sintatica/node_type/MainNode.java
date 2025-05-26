@@ -6,8 +6,7 @@ import analise_sintatica.node_type.stmt_type.BlockNode;
 public class MainNode extends ASTNode {
     private final BlockNode corpo;
 
-    public MainNode(BlockNode corpo, int linha, int coluna) {
-        super(linha, coluna);
+    public MainNode(BlockNode corpo) {
         this.corpo = corpo;
     }
 

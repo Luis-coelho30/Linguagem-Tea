@@ -8,8 +8,7 @@ public class ForNode extends StmtNode {
     private final StmtNode incremento;    // ex: i = i + 1
     private final StmtNode corpo;
 
-    public ForNode(StmtNode inicializacao, ExprNode condicao, StmtNode incremento, StmtNode corpo, int linha, int coluna) {
-        super(linha, coluna);
+    public ForNode(StmtNode inicializacao, ExprNode condicao, StmtNode incremento, StmtNode corpo) {
         this.inicializacao = inicializacao;
         this.condicao = condicao;
         this.incremento = incremento;

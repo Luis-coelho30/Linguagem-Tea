@@ -6,8 +6,7 @@ public class WhileNode extends StmtNode {
     private final ExprNode condicao;
     private final StmtNode corpo;
 
-    public WhileNode(ExprNode condicao, StmtNode corpo, int linha, int coluna) {
-        super(linha, coluna);
+    public WhileNode(ExprNode condicao, StmtNode corpo) {
         this.condicao = condicao;
         this.corpo = corpo;
     }

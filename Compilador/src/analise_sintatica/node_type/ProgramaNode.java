@@ -10,8 +10,7 @@ public class ProgramaNode extends ASTNode {
     private final List<FuncDeclNode> funcoes;
     private final MainNode main;
 
-    public ProgramaNode(List<DeclNode> variaveisGlobais, List<FuncDeclNode> funcoes, MainNode main, int linha, int coluna) {
-        super(linha, coluna);
+    public ProgramaNode(List<DeclNode> variaveisGlobais, List<FuncDeclNode> funcoes, MainNode main) {
         this.variaveisGlobais = variaveisGlobais;
         this.funcoes = funcoes;
         this.main = main;

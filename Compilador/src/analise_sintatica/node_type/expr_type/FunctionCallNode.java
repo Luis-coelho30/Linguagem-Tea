@@ -5,11 +5,10 @@ import analise_lexica.TeaToken;
 import java.util.List;
 
 public class FunctionCallNode extends ExprNode {
-    private final String funcId;
-    private final List<ExprNode> funcArgList;
+    private String funcId;
+    private List<ExprNode> funcArgList;
 
-    public FunctionCallNode(String funcId, List<ExprNode> funcArgList, int linha, int coluna) {
-        super(linha, coluna);
+    public FunctionCallNode(String funcId, List<ExprNode> funcArgList) {
         this.funcId = funcId;
         this.funcArgList = funcArgList;
     }
@@ -20,6 +19,14 @@ public class FunctionCallNode extends ExprNode {
 
     public List<ExprNode> getFuncArgList() {
         return funcArgList;
+    }
+
+    public void setFuncId(String funcId) {
+        this.funcId = funcId;
+    }
+
+    public void setFuncArgList(List<ExprNode> funcArgList) {
+        this.funcArgList = funcArgList;
     }
 
     @Override

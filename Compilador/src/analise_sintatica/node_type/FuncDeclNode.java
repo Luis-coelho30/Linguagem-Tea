@@ -13,8 +13,7 @@ public class FuncDeclNode extends ASTNode {
     private final List<DeclNode> parametros;
     private final BlockNode corpo;
 
-    public FuncDeclNode(String nome, TeaToken tipoRetorno, List<DeclNode> parametros, BlockNode corpo, int linha, int coluna) {
-        super(linha, coluna);
+    public FuncDeclNode(String nome, TeaToken tipoRetorno, List<DeclNode> parametros, BlockNode corpo) {
         this.nome = nome;
         this.tipoRetorno = tipoRetorno;
         this.parametros = parametros;

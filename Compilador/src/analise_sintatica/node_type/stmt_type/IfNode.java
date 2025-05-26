@@ -7,8 +7,7 @@ public class IfNode extends StmtNode {
     private final StmtNode parteElif;
     private final StmtNode parteElse;
 
-    public IfNode(ExprNode condicao, StmtNode parteElif, StmtNode parteElse, int linha, int coluna) {
-        super(linha, coluna);
+    public IfNode(ExprNode condicao, StmtNode parteElif, StmtNode parteElse) {
         this.condicao = condicao;
         this.parteElif = parteElif;
         this.parteElse = parteElse;

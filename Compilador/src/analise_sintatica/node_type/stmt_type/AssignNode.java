@@ -6,8 +6,7 @@ public class AssignNode extends StmtNode {
     private final ExprNode variavel;
     private final ExprNode expressao;
 
-    public AssignNode(ExprNode variavel, ExprNode expressao, int linha, int coluna) {
-        super(linha, coluna);
+    public AssignNode(ExprNode variavel, ExprNode expressao) {
         this.variavel = variavel;
         this.expressao = expressao;
     }

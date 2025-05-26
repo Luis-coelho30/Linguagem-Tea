@@ -5,8 +5,7 @@ import java.util.List;
 public class BlockNode extends StmtNode {
     private final List<StmtNode> statements;
 
-    public BlockNode(List<StmtNode> statements, int linha, int coluna) {
-        super(linha, coluna);
+    public BlockNode(List<StmtNode> statements) {
         this.statements = statements;
     }
 

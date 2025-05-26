@@ -9,8 +9,7 @@ public class SwitchNode extends StmtNode{
     private final List<CaseNode> casos;
     private final StmtNode padrao; // pode ser null
 
-    public SwitchNode(ExprNode expressao, List<CaseNode> casos, StmtNode padrao, int linha, int coluna) {
-        super(linha, coluna);
+    public SwitchNode(ExprNode expressao, List<CaseNode> casos, StmtNode padrao) {
         this.expressao = expressao;
         this.casos = casos;
         this.padrao = padrao;

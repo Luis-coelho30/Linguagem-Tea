@@ -5,8 +5,7 @@ import analise_lexica.TeaToken;
 public class VariavelNode extends ExprNode {
     private final String nome;
 
-    public VariavelNode(String nome, int linha, int coluna) {
-        super(linha, coluna);
+    public VariavelNode(String nome) {
         this.nome = nome;
     }
 
@@ -21,6 +20,6 @@ public class VariavelNode extends ExprNode {
 
     @Override
     public String toString() {
-        return "Var(" + nome + ")" + " em " + "(" + linha + "," + coluna + ")";
+        return "Var(" + nome + ")";
     }
 }

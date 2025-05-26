@@ -3,8 +3,7 @@ package analise_sintatica.node_type.expr_type;
 public class LiteralNode extends ExprNode {
     private final Value valor;
 
-    public LiteralNode(Value valor, int linha, int coluna) {
-        super(linha, coluna);
+    public LiteralNode(Value valor) {
         this.valor = valor;
     }
 
@@ -15,6 +14,6 @@ public class LiteralNode extends ExprNode {
 
     @Override
     public String toString() {
-        return "Literal(" + valor + ") em (" + linha + ", " + coluna + ")";
+        return "Literal(" + valor + ")";
     }
 }

@@ -6,8 +6,7 @@ public class ArrayAccessNode extends ExprNode {
     private final String nome;
     private final int indice;
 
-    public ArrayAccessNode(String nome, int indice, int linha, int coluna) {
-        super(linha, coluna);
+    public ArrayAccessNode(String nome, int indice) {
         this.nome = nome;
         this.indice = indice;
     }

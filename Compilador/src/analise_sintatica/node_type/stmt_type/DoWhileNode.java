@@ -6,8 +6,7 @@ public class DoWhileNode extends StmtNode{
     private final StmtNode corpo;
     private final ExprNode condicao;
 
-    public DoWhileNode(StmtNode corpo, ExprNode condicao, int linha, int coluna) {
-        super(linha, coluna);
+    public DoWhileNode(StmtNode corpo, ExprNode condicao) {
         this.corpo = corpo;
         this.condicao = condicao;
     }
