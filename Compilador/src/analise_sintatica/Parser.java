@@ -44,7 +44,7 @@ public class Parser {
 
     //INICIO dos "filhos" de UnidadesPreMain()
     private void UnidadesPreMain() {
-        if (tokenAtualEh(TeaToken.INT) || (tokenAtualEh(TeaToken.FLOAT)) || (tokenAtualEh(TeaToken.DOUBLE)) || (tokenAtualEh(TeaToken.CHAR)) || (tokenAtualEh(TeaToken.BOOLEAN))) {
+        if(pertenceFirst("DeclStmt")){
             DeclStmt();
             UnidadesPreMain();
         }
