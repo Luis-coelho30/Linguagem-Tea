@@ -22,7 +22,7 @@ public class Parser {
         ArrayList<Token> listaDeTokens = lexer.analisarLexico(programa);
         //Preparando estado inicial
         pilha.push("$");
-        pilha.push("Programa");
+        pilha.push("Expr");
 
         do {
             String topo = pilha.peek();
@@ -42,7 +42,7 @@ public class Parser {
                         String simbolo = producao.get(i);
                         pilha.push(simbolo);
                     }
-                    //construirNoAST(lhs, producao, listaDeTokens.get(apontadorTokens));
+                    construirNoAST(lhs, producao, listaDeTokens.get(apontadorTokens));
                 }
                 else {
                     return; //TODO erro sintatico, token inesperado
@@ -115,6 +115,27 @@ public class Parser {
 
     private void construirNoAST(String regra, List<String> producao,Token tokenAtual) {
         switch (regra) {
+            case "ExprComp1":
+            case "ExprRel1":
+            case "ExprLog":
+                if(!pilhaAST.isEmpty()) {
+                    String operador;
+                    switch (pilha.peek()) {
+                        case "AND":
+                        case "OR":
+                        case "IGUAL":
+                        case "DIFERENTE":
+                        case "MAIOR_QUE":
+                        case "MENOR_QUE":
+                        case "MAIOR_IGUAL":
+                        case "MENOR_IGUAL":
+                            operador = pilha.peek();
+                            ExprBinNode novaExpr = new ExprBinNode(operador, (ExprNode) pilhaAST.pop(), null);
+                            break;
+                    }
+                }
+            break;
+
             case "ExprArit1":
                 if(!pilhaAST.isEmpty()) {
                     if(nextOp.equals("MUL") || nextOp.equals("DIV")) {
@@ -137,7 +158,7 @@ public class Parser {
                         arvoreNaoTerminada = true;
                         pilhaAST.push(novaExpr);
                     }
-                    else if (producao.isEmpty()) {
+                    else if (producao.isEmpty() && arvoreNaoTerminada) {
                         arvoreNaoTerminada = false;
                         ExprNode novoRamo = (ExprNode) pilhaAST.pop();
                         ExprBinNode arvore = (ExprBinNode) pilhaAST.pop();
@@ -165,7 +186,7 @@ public class Parser {
                             "int soma(int a, int b) { " +
                             "return a + b; " +
                             "}";
-        String expr = "(53 * 20 - 10 * 20 + 1 + 10 + 11) == 5";
-        parser.analisarSintaxe(programa);
+        String expr = "5 == 5";
+        parser.analisarSintaxe(expr);
     }
 }
