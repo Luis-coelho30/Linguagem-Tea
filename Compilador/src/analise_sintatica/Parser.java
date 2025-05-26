@@ -131,10 +131,24 @@ public class Parser {
                         case "MENOR_IGUAL":
                             operador = pilha.peek();
                             ExprBinNode novaExpr = new ExprBinNode(operador, (ExprNode) pilhaAST.pop(), null);
+                            pilhaAST.push(novaExpr);
+                            arvoreNaoTerminada = true;
                             break;
                     }
                 }
             break;
+
+            case "ExprNot":
+                if(tokenAtual.getLexema().equals("NOT")) {
+                    ExprUnNode novaNegacao = new ExprUnNode("!", null);
+                    pilhaAST.push(novaNegacao);
+                    arvoreNaoTerminada = true;
+
+                }
+                if (!pilhaAST.isEmpty()) {
+
+                }
+                break;
 
             case "ExprArit1":
                 if(!pilhaAST.isEmpty()) {
@@ -186,7 +200,7 @@ public class Parser {
                             "int soma(int a, int b) { " +
                             "return a + b; " +
                             "}";
-        String expr = "5 == 5";
+        String expr = "!(5 == 5)";
         parser.analisarSintaxe(expr);
     }
 }
