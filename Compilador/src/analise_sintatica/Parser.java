@@ -12,9 +12,9 @@ public class Parser {
 
     private final GramaticaTea gramaticaTea = new GramaticaTea();
     private final Stack<String> pilha = new Stack<>(); //A pilha eh uma pilha de producoes (listas de simbolos)
-    private final Stack<ASTNode> pilhaAST = new Stack<>();
+    private final Stack<ASTNode> treeStack = new Stack<>();
+    private final Stack<ASTNode> nodeStack = new Stack<>();
     private String nextOp = "";
-    private boolean arvoreNaoTerminada;
     private final Lexer lexer = new Lexer();
     private int apontadorTokens = 0;
 
@@ -22,7 +22,7 @@ public class Parser {
         ArrayList<Token> listaDeTokens = lexer.analisarLexico(programa);
         //Preparando estado inicial
         pilha.push("$");
-        pilha.push("Expr");
+        pilha.push("Programa");
 
         do {
             String topo = pilha.peek();
@@ -42,7 +42,7 @@ public class Parser {
                         String simbolo = producao.get(i);
                         pilha.push(simbolo);
                     }
-                    construirNoAST(lhs, producao, listaDeTokens.get(apontadorTokens));
+                    //construirNoAST(lhs, producao, listaDeTokens.get(apontadorTokens));
                 }
                 else {
                     return; //TODO erro sintatico, token inesperado
@@ -79,10 +79,10 @@ public class Parser {
                 case TeaToken.BOOL:
                 case TeaToken.CHAR:
                 case TeaToken.STRING:
-                    pilhaAST.push(new LiteralNode(new Value(inputToken.getLexema(), tipoToken)));
+                    nodeStack.push(new LiteralNode(new Value(inputToken.getLexema(), tipoToken)));
                     break;
                 case TeaToken.IDENTIFICADOR:
-                    pilhaAST.push(new VariavelNode(inputToken.getLexema()));
+                    nodeStack.push(new VariavelNode(inputToken.getLexema()));
                     break;
             }
 
@@ -115,12 +115,15 @@ public class Parser {
 
     private void construirNoAST(String regra, List<String> producao,Token tokenAtual) {
         switch (regra) {
+
+        }
+        /*switch (regra) {
             case "ExprComp1":
             case "ExprRel1":
             case "ExprLog":
-                if(!pilhaAST.isEmpty()) {
+                if(!nodeStack.isEmpty()) { //Se existir uma expressao completa em nodeStack
                     String operador;
-                    switch (pilha.peek()) {
+                    switch (pilha.peek()) { //Se a expressao atual for comparativa, relacional ou logica
                         case "AND":
                         case "OR":
                         case "IGUAL":
@@ -129,10 +132,10 @@ public class Parser {
                         case "MENOR_QUE":
                         case "MAIOR_IGUAL":
                         case "MENOR_IGUAL":
-                            operador = pilha.peek();
-                            ExprBinNode novaExpr = new ExprBinNode(operador, (ExprNode) pilhaAST.pop(), null);
-                            pilhaAST.push(novaExpr);
-                            arvoreNaoTerminada = true;
+                            operador = pilha.peek(); //Pegue o operador
+                            //Crie uma arvore com o operador e a expressao
+                            ExprBinNode novaExpr = new ExprBinNode(operador, (ExprNode) nodeStack.pop(), null);
+                            treeStack.push(novaExpr); //Empilhe a arvore
                             break;
                     }
                 }
@@ -141,43 +144,30 @@ public class Parser {
             case "ExprNot":
                 if(pilha.peek().equals("NOT")) {
                     ExprUnNode novaNegacao = new ExprUnNode("!", null);
-                    pilhaAST.push(novaNegacao);
-                    arvoreNaoTerminada = true;
-
-                }
-                if (!pilhaAST.isEmpty()) {
-
+                    treeStack.push(novaNegacao);
                 }
                 break;
 
             case "ExprArit1":
-                if(!pilhaAST.isEmpty()) {
-                    if(nextOp.equals("MUL") || nextOp.equals("DIV")) {
-                        ExprNode dir = (ExprNode)pilhaAST.pop();
-                        ExprNode esq = (ExprNode)pilhaAST.pop();
-                        ExprBinNode exprMul = new ExprBinNode(nextOp, esq, dir);
-                        pilhaAST.push(exprMul);
-                        nextOp = "";
+                if(!nodeStack.isEmpty()) { //Se houver uma expressao na pilha de nos
+                    if(nextOp.equals("MUL") || nextOp.equals("DIV")) { //Por precedencia, se houver uma operacao de * ou /
+                        ExprNode dir = (ExprNode)nodeStack.pop(); //Pegue o operando direito
+                        ExprNode esq = (ExprNode)nodeStack.pop(); //Pegue o operando esquerdo
+                        ExprBinNode exprMul = new ExprBinNode(nextOp, esq, dir); //Construa uma arvore completa
+                        nodeStack.push(exprMul); //empilhe na pilha de nos
+                        nextOp = ""; //reinicie o marcador de operador
                     }
                     if(tokenAtual.getTipo() == TeaToken.SOMA || tokenAtual.getTipo() == TeaToken.SUB) {
-                        ExprNode novoRamo = (ExprNode) pilhaAST.pop();
+                        ExprNode expr = (ExprNode) nodeStack.pop();
                         ExprBinNode novaExpr;
-                        if(arvoreNaoTerminada) {
-                            ExprBinNode arvore = (ExprBinNode) pilhaAST.pop();
-                            arvore.setDir(novoRamo);
+                        if(!treeStack.isEmpty()) {
+                            ExprBinNode arvore = (ExprBinNode) treeStack.pop();
+                            arvore.setDir(expr);
                             novaExpr = new ExprBinNode(tokenAtual.getTipo().name(), arvore, null);
                         } else {
-                            novaExpr = new ExprBinNode(tokenAtual.getTipo().name(), novoRamo, null);
+                            novaExpr = new ExprBinNode(tokenAtual.getTipo().name(), expr, null);
                         }
-                        arvoreNaoTerminada = true;
-                        pilhaAST.push(novaExpr);
-                    }
-                    else if (producao.isEmpty() && arvoreNaoTerminada) {
-                        arvoreNaoTerminada = false;
-                        ExprNode novoRamo = (ExprNode) pilhaAST.pop();
-                        ExprBinNode arvore = (ExprBinNode) pilhaAST.pop();
-                        arvore.setDir(novoRamo);
-                        pilhaAST.push(arvore);
+                        treeStack.push(novaExpr);
                     }
                 }
                 break;
@@ -185,7 +175,7 @@ public class Parser {
             case "Termo1":
                 if(!producao.isEmpty())
                     nextOp = pilha.peek();
-        }
+        }*/
     }
 
     public static void main(String[] args) {
@@ -193,14 +183,13 @@ public class Parser {
         String programa =   "int z = 10; " +
 
                             "main() {" +
-                            "int x = (5 + 53) == 5; " +
+                            "int x = 5 + 3 * (7 + 8) - 9; " +
                             "soma(x, z);" +
                             "} " +
 
                             "int soma(int a, int b) { " +
                             "return a + b; " +
                             "}";
-        String expr = "!(5 == 5)";
-        parser.analisarSintaxe(expr);
+        parser.analisarSintaxe(programa);
     }
 }
