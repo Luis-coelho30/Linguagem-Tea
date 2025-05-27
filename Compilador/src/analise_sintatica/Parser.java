@@ -4,13 +4,13 @@ import analise_lexica.Lexer;
 import analise_lexica.TeaToken;
 import analise_lexica.Token;
 import analise_sintatica.gramatica.GramaticaTea;
+import exception.AnaliseSintaticaException;
 
 import java.util.*;
 
 public class Parser {
 
     private final GramaticaTea gramaticaTea = new GramaticaTea();
-    private final Stack<String> pilha = new Stack<>(); //A pilha eh uma pilha de producoes (listas de simbolos)
     private final Lexer lexer = new Lexer();
     private int apontadorTokens = 0;
     private Token tokenAtual;//, lookahead;
@@ -19,7 +19,6 @@ public class Parser {
     public void analisarSintaxeRecursivaDescent(String programa) { //somente verifica estrutura por enquanto; nao monta a arvore ainda
         //inicializacoes
         listaTokens = lexer.analisarLexico(programa);
-        listaTokens.add(new Token(listaTokens.size(), -1, -1, "EOF", TeaToken.EOF, -1));
         tokenAtual = listaTokens.get(apontadorTokens);
 
         programa();
@@ -27,7 +26,7 @@ public class Parser {
         if (tokenAtualEh(TeaToken.EOF)) {
             System.out.println("Alles gut!");
         } else {
-            erro();
+            erro("Esperado fim do programa, encontrado: " + getAtual().getTipo());
         }
     }
 
@@ -68,7 +67,7 @@ public class Parser {
         } else if (tokenAtualEh(TeaToken.BOOLEAN)) {
             match(TeaToken.BOOLEAN);
         } else {
-            erro();
+            erro("Esperado: Tipo Primitivo, mas encontrado: " + getAtual().getTipo());
         }
     }
 
@@ -127,9 +126,6 @@ public class Parser {
             match(TeaToken.MAIOR_IGUAL);
             ExprArit();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //    match(TeaToken.EPS);
-        //}
     }
 
     private void ExprArit() {
@@ -166,9 +162,6 @@ public class Parser {
             match(TeaToken.NUMERO);
             match(TeaToken.COLCHETE_DIR);
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        // match(TeaToken.EPS);
-        //}
     }
 
     private void ArgList() {
@@ -176,9 +169,6 @@ public class Parser {
             Expr();
             ArgListTail();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void ArgListTail() {
@@ -187,9 +177,6 @@ public class Parser {
             Expr();
             ArgListTail();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void ExprLog1() {
@@ -210,9 +197,6 @@ public class Parser {
             Fator();
             Termo1();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void ExprArit1() {
@@ -225,9 +209,6 @@ public class Parser {
             Termo();
             ExprArit1();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void ExprNot() {
@@ -249,9 +230,6 @@ public class Parser {
             ExprComp();
             ExprRel1();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void ExprSufixo() {
@@ -259,14 +237,7 @@ public class Parser {
             match(TeaToken.ATRIBUICAO);
             Expr();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //    match(TeaToken.EPS);
-        //}
     }
-
-    //FIM dos "filhos" de UnidadesPreMain()
-
-    //INICIO dos "filhos" de FuncMain()
 
     private void FuncMain() {
         if (tokenAtualEh(TeaToken.MAIN)) {
@@ -290,9 +261,6 @@ public class Parser {
             BlocoInst();
             BlocoInstList();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void BlocoInst() {
@@ -374,9 +342,6 @@ public class Parser {
             match(TeaToken.ELSE);
             BlocoStmt();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //   match(TeaToken.EPS);
-        //}
     }
 
     private void WhileStmt() {
@@ -414,18 +379,12 @@ public class Parser {
             match(TeaToken.ATRIBUICAO);
             Expr();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //   match(TeaToken.EPS);
-        //}
     }
 
     private void ForCond() {
         if (pertenceFirst("Expr")) {
             Expr();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //    match(TeaToken.EPS);
-        //}
     }
 
     private void ForUpdate() {
@@ -434,9 +393,6 @@ public class Parser {
             match(TeaToken.ATRIBUICAO);
             ExprArit();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //    match(TeaToken.EPS);
-        //}
     }
 
     private void DoStmt() {
@@ -468,9 +424,6 @@ public class Parser {
             CaseSection();
             CaseSectionList();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void CaseSection() {
@@ -497,9 +450,6 @@ public class Parser {
             Stmt();
             CaseBody();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void ReturnStmt() {
@@ -514,9 +464,6 @@ public class Parser {
         if (pertenceFirst("Expr")) {
             Expr();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //   match(TeaToken.EPS);
-        //}
     }
 
     private void BreakStmt() {
@@ -532,18 +479,11 @@ public class Parser {
         }
     }
 
-    //FIM dos "filhos" de FuncMain
-
-    //INICIO dos "filhos" de UnidadesPosMain
-
     private void UnidadesPosMain() {
         if (pertenceFirst("FuncDecl")) {
             FuncDecl();
             UnidadesPosMain();
         }
-        //else if (tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void FuncDecl() {
@@ -569,9 +509,6 @@ public class Parser {
             match(TeaToken.COLCHETE_ESQ);
             match(TeaToken.COLCHETE_DIR);
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void ParamList() {
@@ -579,9 +516,6 @@ public class Parser {
             Param();
             ParamListTail();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void Param() {
@@ -597,9 +531,6 @@ public class Parser {
             match(TeaToken.COLCHETE_ESQ);
             match(TeaToken.COLCHETE_DIR);
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
 
     private void ParamListTail() {
@@ -608,18 +539,13 @@ public class Parser {
             Param();
             ParamListTail();
         }
-        //else if(tokenAtualEh(TeaToken.EPS)){
-        //  match(TeaToken.EPS);
-        //}
     }
-
-    //FIM dos "filhos" de UnidadesPosMain
 
     private void match(TeaToken esperado) { //consome o token caso de match
         if (tokenAtualEh(esperado)) {
             avancar();
         } else {
-            erro();
+            erro("Esperado: " + esperado + ", encontrado: " + getAtual().getTipo());
         }
     }
 
@@ -667,8 +593,9 @@ public class Parser {
         return tokenName;
     }
 
-    private void erro() {
-        throw new RuntimeException("Erro sintático!");
+    private void erro(String msgErro) {
+        throw new AnaliseSintaticaException("Erro na linha " + getAtual().getLinha() + ", coluna " + getAtual().getPosInicial()
+                                            + "\n" + msgErro);
     }
 
     public static void main(String[] args) {
