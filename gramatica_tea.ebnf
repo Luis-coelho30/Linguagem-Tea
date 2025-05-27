@@ -1,10 +1,10 @@
-Programa -> PontoDeEntrada
+Programa -> UnidadesPreMain FuncMain UnidadesPosMain
 
-PontoDeEntrada -> DeclStmt PontoDeEntrada | FuncMain FuncDeclList
+UnidadesPreMain -> DeclStmt UnidadesPreMain | ε
 
 FuncMain -> "main" "(" ")" BlocoStmt
 
-FuncDeclList -> FuncDecl FuncDeclList | ε
+UnidadesPosMain -> FuncDecl UnidadesPosMain | ε
 
 FuncDecl -> TypeORtypeArray "id" "(" ParamList ")" BlocoStmt
 ParamList -> Param ParamListTail | ε
@@ -16,16 +16,16 @@ Stmt -> "id" StmtIdTail ";" | DeclStmt | IfStmt | WhileStmt | ForStmt | DoStmt |
 StmtIdTail -> "(" ArgList ")" | "[" "num" "]" "=" Expr | "=" Expr
 
 DeclStmt -> Type "id" DeclStmtSufixo
-DeclStmtSufixo -> "[" "in" "]" ";" | DeclStmt1
+DeclStmtSufixo -> "[" "numero" "]" ";" | DeclStmt1
 DeclStmt1 -> "=" Expr ";" | ";"
 
 TypeORtypeArray -> Type TypeSufixo
 TypeSufixo -> "[" "]" | ε
 Type -> "int" | "float" | "double" | "char" | "boolean" 
 
-IfStmt -> "if" "(" Expr ")" Stmt OptionalElif
-OptionalElif -> "elif" "(" Expr ")" Stmt OptionalElif | OptionalElse
-OptionalElse -> "else" Stmt | ε
+IfStmt -> "if" "(" Expr ")" BlocoStmt OptionalElif
+OptionalElif -> "elif" "(" Expr ")" BlocoStmt OptionalElif | OptionalElse
+OptionalElse -> "else" BlocoStmt | ε
 
 WhileStmt -> "while" "(" Expr ")" Stmt
 
