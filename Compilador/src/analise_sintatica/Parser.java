@@ -16,7 +16,7 @@ public class Parser {
     private int apontadorTokens = 0;
 
     public void analisarSintaxe(String programa) {
-        ArrayList<Token> listaDeTokens = lexer.analisarLexico(programa);
+        List<Token> listaDeTokens = lexer.analisarLexico(programa);
         //Preparando estado inicial
         pilha.push("$");
         pilha.push("Programa");
