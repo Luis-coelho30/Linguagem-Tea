@@ -2,7 +2,7 @@ package analise_sintatica.gramatica.simbolo;
 
 import analise_lexica.TeaToken;
 
-public class Terminal implements Simbolos {
+public class Terminal implements Simbolo {
     private final TeaToken tipoToken;
 
     public Terminal(String tipoToken) {

@@ -1,7 +1,7 @@
 package analise_sintatica.gramatica;
 
 import analise_sintatica.gramatica.simbolo.NaoTerminal;
-import analise_sintatica.gramatica.simbolo.Simbolos;
+import analise_sintatica.gramatica.simbolo.Simbolo;
 import analise_sintatica.gramatica.simbolo.Terminal;
 
 import java.util.*;
@@ -71,7 +71,7 @@ public class Gramatica {
 
         public GramaticaBuilder regra(String ladoEsq, String... ladoDir) { //constutor de regra
             NaoTerminal nt = new NaoTerminal(ladoEsq);
-            List<Simbolos> simbolosDir = new ArrayList<>();
+            List<Simbolo> simbolosDir = new ArrayList<>();
 
             for (String s : ladoDir) {
                 if(ehNaoTerminal(s)) {
@@ -95,7 +95,7 @@ public class Gramatica {
 
         public GramaticaBuilder montarMapaDeOcorrencias() {
             for (RegraProd regra : gramatica.getRegras()) {
-                for (Simbolos simb : regra.getLadoDir()) {
+                for (Simbolo simb : regra.getLadoDir()) {
                     if (!simb.ehTerminal()) {
                         ocorrenciasPorSimbolo
                                 .computeIfAbsent(simb.getNome(), k -> new ArrayList<>())

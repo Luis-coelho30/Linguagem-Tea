@@ -1,16 +1,16 @@
 package analise_sintatica.gramatica;
 
 import analise_sintatica.gramatica.simbolo.NaoTerminal;
-import analise_sintatica.gramatica.simbolo.Simbolos;
+import analise_sintatica.gramatica.simbolo.Simbolo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RegraProd {
     private final NaoTerminal ladoEsq;
-    private final List<Simbolos> ladoDir;
+    private final List<Simbolo> ladoDir;
 
-    public RegraProd(NaoTerminal ladoEsq, List<Simbolos> ladoDir) {
+    public RegraProd(NaoTerminal ladoEsq, List<Simbolo> ladoDir) {
         this.ladoEsq = ladoEsq;
         this.ladoDir = ladoDir;
     }
@@ -19,7 +19,7 @@ public class RegraProd {
         return ladoEsq;
     }
 
-    public List<Simbolos> getLadoDir() {
+    public List<Simbolo> getLadoDir() {
         return ladoDir;
     }
 

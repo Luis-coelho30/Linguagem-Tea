@@ -1,6 +1,6 @@
 package analise_sintatica.gramatica.simbolo;
 
-public interface Simbolos {
+public interface Simbolo {
     boolean ehTerminal();
     String getNome();
 }
