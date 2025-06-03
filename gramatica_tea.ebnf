@@ -13,7 +13,7 @@ Param -> Type "id" ParamSufixo
 ParamSufixo -> "[" "]" | ε
  
 Stmt -> "id" StmtIdTail ";" | DeclStmt | IfStmt | WhileStmt | ForStmt | DoStmt | SwitchStmt | ReturnStmt | BlocoStmt | BreakStmt | EmptyStmt
-StmtIdTail -> "(" ArgList ")" | "[" "num" "]" "=" Expr | "=" Expr
+StmtIdTail -> "(" ArgList ")" | "[" "numero" "]" "=" Expr | "=" Expr
 
 DeclStmt -> Type "id" DeclStmtSufixo
 DeclStmtSufixo -> "[" "numero" "]" ";" | DeclStmt1
@@ -74,10 +74,10 @@ ExprArit' -> ("+" | "-") Termo ExprArit' | ε
 Termo -> Fator Termo'
 Termo' -> ("*" | "/") Fator Termo' | ε
 
-Fator -> "(" Expr ")" | "num" | "true" | "false" | "id" FatorSufixo
+Fator -> "(" Expr ")" | "numero" | "true" | "false" | "id" FatorSufixo
 
-FatorSufixo -> "(" ArgList ")" | "[" "num" "]" | ε
+FatorSufixo -> "(" ArgList ")" | "[" "numero" "]" | ε
 
-argList -> Expr ArgListTail | ε
+ArgList -> Expr ArgListTail | ε
 
-argListTail -> "," Expr ArgListTail | ε
+ArgListTail -> "," Expr ArgListTail | ε
