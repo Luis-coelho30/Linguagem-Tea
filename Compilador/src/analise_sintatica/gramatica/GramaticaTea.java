@@ -277,14 +277,10 @@ public class GramaticaTea {
     }
 
     public List<String> obterProducao(String naoTerminal, String simboloEntrada) {
-        //A saida
         List<String> producao = null;
-        //As regras definidas de um naoTerminal na tabelaLL1
         Map<String, RegraProd> entradas = tabelaLL1.get(naoTerminal);
-        //Se o nao terminal existe na tabela
         if (entradas != null) {
             RegraProd regra = entradas.get(simboloEntrada);
-            //Se existe uma regra desse nao terminal para o token de entrada
             if(regra != null) {
                 if(regra.getNomesSimbolosDir().getFirst().equals("EPS")) {
                     producao = List.of();
