@@ -171,7 +171,7 @@ public class GramaticaTea {
             for (String simb : firstAlfa) {
                 if (!simb.equals("EPS")) {
                     if (tabelaLL1.get(A).containsKey(simb)) {
-                        System.err.println("⚠️ Conflito LL(1): M[" + A + ", " + simb + "] já contém "
+                        System.err.println("Conflito LL(1): M[" + A + ", " + simb + "] já contém "
                                 + tabelaLL1.get(A).get(simb).getNomesSimbolosDir().toString() + " e foi tentado inserir " + regraProd.getNomesSimbolosDir().toString());
                     } else {
                         tabelaLL1.get(A).put(simb, regraProd);
@@ -183,7 +183,7 @@ public class GramaticaTea {
             if (firstAlfa.contains("EPS")) {
                 for (String b : follow.get(A)) {
                     if (tabelaLL1.get(A).containsKey(b)) {
-                        System.err.println("⚠️ Conflito LL(1): M[" + A + ", " + b + "] já contém "
+                        System.err.println("Conflito LL(1): M[" + A + ", " + b + "] já contém "
                                 + tabelaLL1.get(A).get(b).getNomesSimbolosDir().toString() + " e foi tentado inserir " + regraProd.getNomesSimbolosDir().toString());
                     } else {
                         tabelaLL1.get(A).put(b, regraProd);
